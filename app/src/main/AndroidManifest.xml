@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="pwgame.passwordgame" >
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".gamePortal"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name=".levelActivity"
+            android:label="@string/title_activity_level" >
+        </activity>
+        <activity
+            android:name=".mainPage"
+            android:label="@string/title_activity_main_page" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".schemaLibrary"
+            android:label="@string/title_activity_schema_library" >
+        </activity>
+        <activity
+            android:name=".schemaBuilder"
+            android:label="@string/title_activity_schema_builder" >
+        </activity>
+    </application>
+
+</manifest>

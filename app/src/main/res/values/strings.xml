@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">passwordGame</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_level">levelActivity</string>
+    <string name="title_activity_main_page">mainPage</string>
+    <string name="title_activity_schema_library">schemaLibrary</string>
+    <string name="title_activity_schema_builder">schemaBuilder</string>
+</resources>
