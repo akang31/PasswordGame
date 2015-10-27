@@ -7,12 +7,15 @@ import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -50,18 +53,27 @@ public class gamePortal extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        int rows = 1;
+        int rows = 5;
         int cols = 5;
         PasswordData[] pwd = new PasswordData[rows*cols];
         createLevels(pwd);
+        LinearLayout overall = new LinearLayout(this);
+        overall.setOrientation(LinearLayout.VERTICAL);
+        RelativeLayout temp = new RelativeLayout(this);
+        TextView txt = new TextView(this);
+        txt.setText("LEVELS");
+        temp.setGravity(Gravity.CENTER);
+        temp.addView(txt);
+        overall.addView(temp);
         LinearLayout ll = new LinearLayout(this);
+        ll.setOrientation(LinearLayout.VERTICAL);
         ll.setWeightSum(rows*1.0f);
         for (int x = 0; x < rows; x++) {
             LinearLayout tl = new LinearLayout(this);
             tl.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT ,LinearLayout.LayoutParams.MATCH_PARENT,1.0f));
             tl.setWeightSum(1.0f);
             for (int y = 0; y < cols; y++) {
-                levelButton a = new levelButton(this, (x*cols+y)+"",pwd[x*cols+y]);
+                levelButton a = new levelButton(this, (x*cols+y+1)+"",pwd[x*cols+y]);
                 int id = View.generateViewId();
                 a.setId(id);
                 LinearLayout.LayoutParams set = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f/cols);
@@ -70,7 +82,8 @@ public class gamePortal extends AppCompatActivity {
             }
             ll.addView(tl);
         }
-        setContentView(ll);
+        overall.addView(ll);
+        setContentView(overall);
 
 //        setContentView(R.layout.activity_game_portal);
     }

@@ -2,15 +2,96 @@ package pwgame.passwordgame;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class schemaBuilder extends AppCompatActivity {
 
+    private HashMap<String, String> map;
+    private ArrayList<String> rules;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_schema_builder);
+        map = new HashMap<String, String>();
+        rules = new ArrayList<String>();
+        rules.add("MAP cc 0");
+        rules.add("OUTPUT 0");
+        mainMenuCreate();
+        //setContentView(R.layout.activity_schema_builder);
+    }
+
+    private void mainMenuCreate() {
+        LinearLayout ll = new LinearLayout(this);
+        ll.setOrientation(LinearLayout.VERTICAL);
+        Button toMap = new Button(this);
+        toMap.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                mapMenuCreate();
+            }
+        });
+        toMap.setText("Edit Mapping");
+        Button toSchema = new Button(this);
+        toSchema.setOnClickListener(new View.OnClickListener() {
+           public void onClick(View v) {
+               schemaMenuCreate();
+           }
+        });
+        toSchema.setText("Edit Rules");
+        RelativeLayout t1 = new RelativeLayout(this);
+        t1.setGravity(Gravity.CENTER);
+        RelativeLayout t2 = new RelativeLayout(this);
+        t2.setGravity(Gravity.CENTER);
+        t1.addView(toMap);
+        t2.addView(toSchema);
+        ll.addView(t1);
+        ll.addView(t2);
+        setContentView(ll);
+    }
+
+    private void mapMenuCreate() {
+
+    }
+
+    private void schemaMenuCreate() {
+        LinearLayout overall = new LinearLayout(this);
+        overall.setOrientation(LinearLayout.VERTICAL);
+        TextView tv = new TextView(this);
+        tv.setText("YOUR SCHEMA");
+        LinearLayout ll = new LinearLayout(this);
+        ll.setOrientation(LinearLayout.VERTICAL);
+        rules.add("ADD NEW RULE");
+        rules.add("SAVE");
+        for (int x = 0; x < rules.size(); x++) {
+            Button b = new Button(this);
+            b.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            b.setText(rules.get(x));
+            if (rules.get(x).equals("SAVE")) {
+                b.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mainMenuCreate();
+                    }
+                });
+            } else if (rules.get(x).equals("ADD NEW RULE")) {
+
+            } else {
+
+            }
+            ll.addView(b);
+        }
+        rules.remove(rules.size()-1);
+        rules.remove(rules.size()-1);
+        overall.addView(ll);
+        setContentView(overall);
     }
 
     @Override
