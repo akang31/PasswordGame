@@ -6,9 +6,11 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -58,7 +60,27 @@ public class schemaBuilder extends AppCompatActivity {
     }
 
     private void mapMenuCreate() {
-
+        LinearLayout ll = new LinearLayout(this);
+        Spinner from = new Spinner(this);
+        String[] fromEntries = new String[]{"A-Z", "0-9"};
+        ArrayAdapter spinAdapt1 = new ArrayAdapter(this, android.R.layout.simple_spinner_item, fromEntries);
+        from.setAdapter(spinAdapt1);
+        Spinner to = new Spinner(this);
+        String[] toEntries = new String[]{"A-Z", "0-9"};
+        ArrayAdapter spinAdapt2 = new ArrayAdapter(this, android.R.layout.simple_spinner_item, toEntries);
+        to.setAdapter(spinAdapt2);
+        ll.addView(from);
+        ll.addView(to);
+        Button but = new Button(this);
+        but.setText("Save");
+        but.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mainMenuCreate();
+            }
+        });
+        ll.addView(but);
+        setContentView(ll);
     }
 
     private void schemaMenuCreate() {

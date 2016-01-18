@@ -91,50 +91,82 @@ public class gamePortal extends AppCompatActivity {
     private void createLevels(PasswordData[] pwd) {
         //HashMap<String, String> map, String[] instructions
 
-        //Case 1: Alphabet permutation of off by one
+        //Case 1: Fixed Password
         HashMap<String, String> map1 = new HashMap<String, String>();
-        for (int x = 0; x < 25; x++) {
-            map1.put(""+(char)('A'+x), ""+(char)('A'+x+1));
+        for (int x = 0; x < 26; x++) {
+            map1.put(""+(char)('A'+x), "aA1@bB2$");
         }
-        map1.put("Z", "A");
-        String[] instr1 = new String[]{"MAP cc 0", "OUTPUT 0"};
+        String[] instr1 = new String[]{"MAP 0 0", "LABEL START", "OUTPUT 0", "SHIFT 0 1", "IF !EOS 0 START", "END"};
         pwd[0] = new PasswordData(map1, instr1);
 
-        //Case 2: Alphabet permutation off by two
+        //Case 2: Fixed password + add exact challenge
         HashMap<String, String> map2 = new HashMap<String, String>();
-        for (int x = 0; x < 24; x++) {
-            map2.put(""+(char)('A'+x), ""+(char)('A'+x+2));
+        for (int x = 0; x < 26; x++) {
+            map2.put(""+(char)('A'+x), "aA@1");
         }
-        map2.put("Y", "A");
-        map2.put("Z", "B");
-        String[] instr2 = new String[]{"MAP cc 0", "OUTPUT 0"};
+        String[] instr2 = new String[]{"MAP 0 1", "LABEL START1", "OUTPUT 1", "SHIFT 1 1", "IF !EOS 1 START1", "LABEL START2", "OUTPUT 0", "SHIFT 0 1", "IF !EOS 0 START2", "END"};
         pwd[1] = new PasswordData(map2, instr2);
 
-        //Case 3: Partial Alphabet Mapping
+        //Case 3: Add one
         HashMap<String, String> map3 = new HashMap<String, String>();
-        for (int x = 0; x < 10; x++) {
-            map3.put(""+(char)('A'+x), ""+(char)('A'+x+5));
+        for (int x = 0; x < 26; x++) {
+            map3.put(""+(char)('A'+x), ""+(char)('A'+(x+1)%26));
         }
-        String[] instr3 = new String[]{"MAP cc 0", "OUTPUT 0"};
+        String[] instr3 = new String[]{"LABEL START", "MAP 0 1", "OUTPUT 1", "SHIFT 0 1", "IF !EOS 0 START", "END"};
         pwd[2] = new PasswordData(map3, instr3);
 
 
-        //Case 4: Partial Alphabet to Digit Mapping
+        //Case 4: Start at Second Vowel
         HashMap<String, String> map4 = new HashMap<String, String>();
-        for (int x = 0; x < 10; x++) {
-            map4.put(""+(char)('A'+x), x+"");
+        for (int x = 0; x < 26; x++) {
+            map4.put(""+(char)('A'+x), ""+(char)('A'+(x+1)%26));
         }
-        String[] instr4 = new String[]{"MAP cc 0", "OUTPUT 0"};
+        String[] instr4 = new String[]{"IF !VOWEL 0 V", "SHIFT 1 1", "LABEL V", "SHIFT 0 1", "IF EOS 0 W-",  "IF !VOWEL 0 V", "SHIFT 1 1", "IF EQ &1 #2 W", "GOTO V",
+                                        "LABEL W-", "SHIFT 0 -1 MOD",
+                                        "LABEL W", "SHIFT 0 -1 MOD", "SET 2 &0", "PARSE 2", "LOG 2", "SHIFT 0 1 MOD",
+                                        "LABEL W+", "MAP 0 1", "OUTPUT 1", "IF EQ &0 2 END", "SHIFT 0 1 MOD", "GOTO W+",
+                                        "LABEL END", "END"};
         pwd[3] = new PasswordData(map4, instr4);
 
-        //Case 5: Running Sum mod 10
+        //Case 5: Output first letter after first vowel
         HashMap<String, String> map5 = new HashMap<String, String>();
-        for (int x = 0; x < 26; x++) {
-            map5.put(""+(char)('A'+x), ""+x%10);
-        }
-        String[] instr5 = new String[]{"MAP cc 0", "SET 0 0 + ps m10", "OUTPUT 0", "PASS 0"};
+        String[] instr5 = new String[]{"LABEL START", "IF VOWEL 0 END", "SHIFT 0 1", "IF EOS 0 END2", "GOTO START",
+                                        "LABEL END", "SHIFT 0 1 MOD", "OUTPUT 0", "END",
+                                        "LABEL END2", "SHIFT 0 -1 MOD", "OUTPUT 0", "END"};
         pwd[4] = new PasswordData(map5, instr5);
 
+        //Case 6: Output first letter whose capitalization contains a vertical line segment
+        HashMap<String, String> map6 = new HashMap<String, String>();
+        char[] letters = new char[]{'B', 'D', 'E', 'F', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'P', 'R', 'R', 'T', 'U'};
+        for (char a : letters) {
+            map6.put(a+"", " ");
+        }
+        String[] instr6 = new String[]{ "LABEL START", "IF EOS 0 END", "MAP 0 1", "SHIFT 0 1", "IF EQ &1 #-2 START", "LABEL END", "SHIFT 0 -1", "OUTPUT 0", "END"};
+        pwd[5] = new PasswordData(map6, instr6);
+
+        //Case 7: Output first letter whose capitalization contains a vertical line segment
+        HashMap<String, String> map7 = new HashMap<String, String>();
+        char[] letters1 = new char[]{'B', 'C', 'D', 'E', 'G', 'P', 'T', 'V', 'Z'};
+        for (char a : letters1) {
+            map7.put(a+"", " ");
+        }
+        String[] instr7 = new String[]{ "LABEL START", "IF EOS 0 END", "MAP 0 1", "SHIFT 0 1", "IF EQ &1 #-2 START", "LABEL END", "SHIFT 0 -1", "OUTPUT 0", "END"};
+        pwd[6] = new PasswordData(map7, instr7);
+
+        // Skip Game 8
+
+        //Case 9:  Telephone number schema
+        HashMap<String, String> map9 = new HashMap<String, String>();
+        String phonenumber = "4324324324";
+        map9.put("@", phonenumber);
+        String[] instr9 = new String[]{"MAP #@ 1", "LABEL START", "IF EOS 0 END", "SET 2 @1 + 0", "SHIFT 0 1", "SHIFT 1 1", "OUTPUT 2", "GOTO START", "LABEL END", "END"};
+        pwd[8] = new PasswordData(map9, instr9);
+
+        //Case 10: Wrap aroudn telephone number schema
+        HashMap<String, String> map10 = new HashMap<String, String>();
+        map10.put("@", phonenumber);
+        String[] instr10 = new String[]{"MAP #@ 1", "LABEL START", "IF EOS 1 END", "SET 2 @1 + 0", "SHIFT 0 1 MOD", "SHIFT 1 1", "OUTPUT 2", "GOTO START", "LABEL END", "END"};
+        pwd[9] = new PasswordData(map10, instr10);
     }
 
     @Override

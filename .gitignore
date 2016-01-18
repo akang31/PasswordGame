@@ -1,3 +1,5 @@
+/*.zip
+/app/src/main/java/pwgame/passwordgame/OldPasswordData.java
 .gradle
 /local.properties
 /.idea/workspace.xml

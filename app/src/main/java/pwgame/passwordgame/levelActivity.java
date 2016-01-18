@@ -105,8 +105,10 @@ public class levelActivity extends AppCompatActivity {
         Button add2 = new Button(this);
         add2.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
         add2.setText(theirGuess);
+        add2.setTransformationMethod(null);
         Button add3 = new Button(this);
         add3.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+        add3.setTransformationMethod(null);
         add3.setText(response);
         add.addView(add1);
         add.addView(add2);
