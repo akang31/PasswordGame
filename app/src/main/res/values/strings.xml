@@ -7,4 +7,6 @@
     <string name="title_activity_main_page">mainPage</string>
     <string name="title_activity_schema_library">schemaLibrary</string>
     <string name="title_activity_schema_builder">schemaBuilder</string>
+    <string name="title_activity_post_level">postLevelActivity</string>
+    <string name="title_activity_trace_display">traceDisplayActivity</string>
 </resources>

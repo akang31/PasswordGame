@@ -32,6 +32,14 @@
             android:name=".schemaBuilder"
             android:label="@string/title_activity_schema_builder" >
         </activity>
+        <activity
+            android:name=".postLevelActivity"
+            android:label="@string/title_activity_post_level" >
+        </activity>
+        <activity
+            android:name=".traceDisplayActivity"
+            android:label="@string/title_activity_trace_display" >
+        </activity>
     </application>
 
 </manifest>

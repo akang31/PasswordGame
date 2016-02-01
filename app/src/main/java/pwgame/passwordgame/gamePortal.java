@@ -27,12 +27,14 @@ public class gamePortal extends AppCompatActivity {
 
     private class levelButton extends Button {
         private PasswordData pdata;
+        private int level;
         public levelButton(Context ctxt) {
             super(ctxt);
         }
-        public levelButton(Context ctxt, String text, PasswordData pdata) {
+        public levelButton(Context ctxt, String text, PasswordData pdata, int level) {
             super(ctxt);
             setText(text);
+            this.level=level;
             this.pdata = pdata;
             setOnClickListener(new clickListener(pdata));
         }
@@ -45,6 +47,7 @@ public class gamePortal extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), levelActivity.class);
                 intent.putExtra("PasswordData", pd);
+                intent.putExtra("level", level);
                 startActivity(intent);
             }
         }
@@ -73,7 +76,7 @@ public class gamePortal extends AppCompatActivity {
             tl.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT ,LinearLayout.LayoutParams.MATCH_PARENT,1.0f));
             tl.setWeightSum(1.0f);
             for (int y = 0; y < cols; y++) {
-                levelButton a = new levelButton(this, (x*cols+y+1)+"",pwd[x*cols+y]);
+                levelButton a = new levelButton(this, (x*cols+y+1)+"",pwd[x*cols+y], x*cols+y);
                 int id = View.generateViewId();
                 a.setId(id);
                 LinearLayout.LayoutParams set = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f/cols);
@@ -93,18 +96,21 @@ public class gamePortal extends AppCompatActivity {
 
         //Case 1: Fixed Password
         HashMap<String, String> map1 = new HashMap<String, String>();
-        for (int x = 0; x < 26; x++) {
-            map1.put(""+(char)('A'+x), "aA1@bB2$");
-        }
-        String[] instr1 = new String[]{"MAP 0 0", "LABEL START", "OUTPUT 0", "SHIFT 0 1", "IF !EOS 0 START", "END"};
+        map1.put("@", "aA1@bB2$");
+        /**
+         *  indices[0] = 0;
+         *  mem[0] = "CHALLENGE";
+         *  MAP 0 0 (map "C" to "aA1@bB2$")
+         *  indices[0] = 0;
+         *  mem[0] = "aA1@bB2$";
+         */
+        String[] instr1 = new String[]{"MAP #@ 1", "LABEL START", "OUTPUT 1", "SHIFT 1 1", "IF !EOS 1 START", "END"};
         pwd[0] = new PasswordData(map1, instr1);
 
         //Case 2: Fixed password + add exact challenge
         HashMap<String, String> map2 = new HashMap<String, String>();
-        for (int x = 0; x < 26; x++) {
-            map2.put(""+(char)('A'+x), "aA@1");
-        }
-        String[] instr2 = new String[]{"MAP 0 1", "LABEL START1", "OUTPUT 1", "SHIFT 1 1", "IF !EOS 1 START1", "LABEL START2", "OUTPUT 0", "SHIFT 0 1", "IF !EOS 0 START2", "END"};
+        map2.put("@","aA@1");
+        String[] instr2 = new String[]{"MAP #@ 1", "LABEL START1", "OUTPUT 1", "SHIFT 1 1", "IF !EOS 1 START1", "LABEL START2", "OUTPUT 0", "SHIFT 0 1", "IF !EOS 0 START2", "END"};
         pwd[1] = new PasswordData(map2, instr2);
 
         //Case 3: Add one
@@ -123,7 +129,7 @@ public class gamePortal extends AppCompatActivity {
         }
         String[] instr4 = new String[]{"IF !VOWEL 0 V", "SHIFT 1 1", "LABEL V", "SHIFT 0 1", "IF EOS 0 W-",  "IF !VOWEL 0 V", "SHIFT 1 1", "IF EQ &1 #2 W", "GOTO V",
                                         "LABEL W-", "SHIFT 0 -1 MOD",
-                                        "LABEL W", "SHIFT 0 -1 MOD", "SET 2 &0", "PARSE 2", "LOG 2", "SHIFT 0 1 MOD",
+                                        "LABEL W", "SHIFT 0 -1 MOD", "SET 2 &0", "PARSE 2", "SHIFT 0 1 MOD",
                                         "LABEL W+", "MAP 0 1", "OUTPUT 1", "IF EQ &0 2 END", "SHIFT 0 1 MOD", "GOTO W+",
                                         "LABEL END", "END"};
         pwd[3] = new PasswordData(map4, instr4);

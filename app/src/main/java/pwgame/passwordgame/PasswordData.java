@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,7 +15,9 @@ import java.util.StringTokenizer;
  */
 public class PasswordData implements Parcelable
 {
+    private String description;
     private final int SIZE_OF_MEMORY = 3;
+    private ArrayList<String> trace;
     private final String[] VOWEL_VALUES = new String[]{"A", "E", "I", "O", "U", "a", "e", "i", "o", "u"};
     private final HashSet<String> VOWELS = new HashSet<String>(Arrays.asList(VOWEL_VALUES));
     private HashMap<String, String> preProcess;
@@ -42,10 +45,16 @@ public class PasswordData implements Parcelable
         int lenOfInstructions = source.readInt();
         instructions = new String[lenOfInstructions];
         source.readStringArray(instructions);
+        description = source.readString();
     }
     public PasswordData(HashMap<String, String> preProcess, String[] instructions) {
         this.preProcess = preProcess;
         this.instructions = instructions;
+    }
+    public PasswordData(HashMap<String, String> preProcess, String[] instructions, String description) {
+        this.preProcess = preProcess;
+        this.instructions = instructions;
+        this.description = description;
     }
     private class Result {
         private int index;
@@ -61,22 +70,150 @@ public class PasswordData implements Parcelable
             return output;
         }
     }
-    public String getPassword(String challenge) {
+    public ArrayList<String> getTrace() {
+        return trace;
+    }
+    public String getPassword(String challenge, boolean includeTrace) {
         String password = "";
         int index = 0;
         int[] indices = new int[SIZE_OF_MEMORY];
         String[] mem = new String[SIZE_OF_MEMORY];
         indices[0] = 0;
         mem[0] = challenge;
+        int count = 0;
+        trace = new ArrayList<String>();
         while (!done(index)) {
             Log.e("RUNNING", index+"");
+            if (true) {
+                trace.add(tracify(instructions[index]));
+                Log.e("TRACE", trace.get(trace.size()-1));
+            }
             Result res = run(index, indices, mem);
             index = res.getIndex();
             password += res.getOutput();
+            count++;
         }
+        if (true) {
+            trace.add(tracify(instructions[index]));
+            Log.e("TRACE", trace.get(trace.size()-1));
+        }
+        Log.e("Counter", ""+count);
+        Log.e("Ratio", ""+((double)count)/challenge.length());
         return password;
     }
+    public String indexOfVariableToString(String ind) {
+        if (ind.charAt(0) == '&') {
+            return "pointer index of variable " + ind.substring(1);
+        } else if (ind.charAt(0) == '#') {
+            return "number " + ind.substring(1);
+        } else if (ind.charAt(0) == '@') {
+            return "number at variable " + ind.substring(1);
+        } else {
+            return "variable " + ind;
+        }
+    }
+    public String tracify(String instr) {
+    /*
+            Variable = 0,1,... indices in string array
 
+            To map a character: MAP [indexOfVariable or #STRING] [indexOfVariable]
+                If no valid mapping exists, simply set mem to empty string and indices to -2
+                Put mapping of FIRST var into SECOND var
+
+            Set a variable to an expression: SET [indexOfVariable] [expression]
+                This works either character by character or on an integer basis.
+                    e.g. With indices = {0,0} and mem = {"ASD", "FGH"}
+                        SET 0 1 will result in mem = {"FSD", "FGH"}
+                Valid expressions:
+                    [indexOfVariable*]
+                    [indexOfVariable*] {+,-,*} [indexOfVariable*]
+                    [indexOfVariable*] {+,-,*} [indexOfVariable*] [mX]  (where X is a number to mod by)
+                indexOfVariable*:
+                    "[0-9]+"  = direct index and assumes it is the CHARACTER at the index specified by indices
+                    "&[0-9]+" = the value in indices, the pointer index
+                    "#[0-9]+" = direct number input
+                    "@[0-9]+" = number at index (instead of whole number)
+
+                    e.g. if we have indices[0] = 1 and mem[0] = "HELLO", 0 would get us "E" while &0 would get us 1
+
+            Go to some label: GOTO [label]
+
+            Create a label: LABEL [name]
+
+            Basic IF statement functionality: IF [statement] [label]
+                Valid statements:
+                    EQ [indexOfVariable*] [indexOfVariable*]
+                    EOS [indexOfVariable] : checks if it is the end of string
+                    VOWEL [indexOfVariable] : checks if the character is a vowel
+                    ![statement] : negate
+
+            Shift a pointer in memory: SHIFT [indexOfVariable] [number shifted, signed] [wrap]
+                if anything is put in for wrap, the shift will wrap around.
+
+            PARSE : convert to int
+
+            End password schema: END
+
+            OUTPUT [indexOfVariable]
+
+            LOG [indexOfVariable*]
+                Debug purposes, print to console.
+
+            Instructions must be space separated.
+         */
+        StringTokenizer s1 = new StringTokenizer(instr);
+        String start = s1.nextToken();
+        String ret = "";
+        if (start.equals("MAP")) {
+            ret += "MAP ";
+            String next = s1.nextToken();
+            if (next.charAt(0) == '#') {
+                ret += "\""+ next.substring(1)+"\"";
+            } else {
+                ret += "variable " + next;
+            }
+            ret += " into variable " + s1.nextToken();
+        } else if (start.equals("SET")) {
+            ret = "SET variable " + s1.nextToken() + " to " + indexOfVariableToString(s1.nextToken());
+            if (s1.hasMoreTokens()) {
+                ret += " " + s1.nextToken() + " " + indexOfVariableToString(s1.nextToken());
+            }
+            if (s1.hasMoreTokens()) {
+                ret += "mod " + s1.nextToken().substring(1);
+            }
+        } else if (start.equals("GOTO")) {
+            ret = "GOTO label " + s1.nextToken();
+        } else if (start.equals("LABEL")) {
+            ret = instr;
+        } else if (start.equals("IF")) {
+            ret = "IF ";
+            String next = s1.nextToken();
+            if (next.charAt(0) == '!') {
+                next = next.substring(1);
+                ret += "not ";
+            }
+            if (next.equals("EQ")) {
+                ret += indexOfVariableToString(s1.nextToken()) + " equals " + indexOfVariableToString(s1.nextToken());
+            } else if (next.equals("EOS")) {
+                ret += "variable " + s1.nextToken() + " is at end of string";
+            } else if (next.equals("VOWEL")) {
+                ret += "variable " + s1.nextToken() + " is a vowel";
+            }
+            ret += " then goto label " + s1.nextToken();
+        } else if (start.equals("SHIFT")) {
+            ret = "SHIFT variable " + s1.nextToken() + " by " + s1.nextToken();
+            if (s1.hasMoreTokens()) {
+                ret += " with wraparound";
+            }
+        } else if (start.equals("PARSE")) {
+            ret = "PARSE variable " + s1.nextToken() + " into integer";
+        } else if (start.equals("END")) {
+            ret = "END";
+        } else if (start.equals("OUTPUT")) {
+            ret = start + " variable " + s1.nextToken();
+        }
+        return ret;
+    }
     /**
      *
      *
@@ -365,5 +502,6 @@ public class PasswordData implements Parcelable
         dest.writeStringArray(put);
         dest.writeInt(instructions.length);
         dest.writeStringArray(instructions);
+        dest.writeString(description);
     }
 }
