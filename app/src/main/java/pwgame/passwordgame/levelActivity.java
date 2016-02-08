@@ -4,10 +4,13 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -151,9 +154,9 @@ public class levelActivity extends AppCompatActivity {
         add.setWeightSum(3.0f);
         Button add1 = new Button(this);
         add1.setText(curChal);
-        add1.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+        add1.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
         Button add2 = new Button(this);
-        add2.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+        add2.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
         add2.setText(theirGuess);
         add2.setTransformationMethod(null);
         Button add3 = new Button(this);
@@ -161,11 +164,12 @@ public class levelActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), traceDisplayActivity.class);
-                intent.putExtra("trace", pwd.getTrace());
+                intent.putExtra("trace", pwd.getFullTrace());
+                //intent.putStringArrayListExtra("trace", pwd.getTrace());
                 startActivity(intent);
             }
         });
-        add3.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f));
+        add3.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
         add3.setTransformationMethod(null);
         add3.setText(response);
         add.addView(add1);

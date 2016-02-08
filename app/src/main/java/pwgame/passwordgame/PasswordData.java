@@ -18,6 +18,9 @@ public class PasswordData implements Parcelable
     private String description;
     private final int SIZE_OF_MEMORY = 3;
     private ArrayList<String> trace;
+    private ArrayList<ArrayList<String>> memHist;
+    private ArrayList<ArrayList<Integer>> indHist;
+    private ArrayList<String> out;
     private final String[] VOWEL_VALUES = new String[]{"A", "E", "I", "O", "U", "a", "e", "i", "o", "u"};
     private final HashSet<String> VOWELS = new HashSet<String>(Arrays.asList(VOWEL_VALUES));
     private HashMap<String, String> preProcess;
@@ -73,6 +76,9 @@ public class PasswordData implements Parcelable
     public ArrayList<String> getTrace() {
         return trace;
     }
+    public PasswordTrace getFullTrace() {
+        return new PasswordTrace(trace, memHist, indHist, out);
+    }
     public String getPassword(String challenge, boolean includeTrace) {
         String password = "";
         int index = 0;
@@ -82,20 +88,33 @@ public class PasswordData implements Parcelable
         mem[0] = challenge;
         int count = 0;
         trace = new ArrayList<String>();
+        memHist = new ArrayList<ArrayList<String>>();
+        indHist = new ArrayList<ArrayList<Integer>>();
+        out = new ArrayList<String>();
+        String curOut = "";
         while (!done(index)) {
             Log.e("RUNNING", index+"");
-            if (true) {
-                trace.add(tracify(instructions[index]));
-                Log.e("TRACE", trace.get(trace.size()-1));
-            }
             Result res = run(index, indices, mem);
+            if (true) {
+                String tr = tracify(instructions[index], mem, indices);
+                if (!tr.equals("")) {
+                    trace.add(tr);
+                    memHist.add(new ArrayList<String>(Arrays.asList(Arrays.copyOf(mem, mem.length))));
+                    Integer[] copy = new Integer[indices.length];
+                    for (int x = 0; x < indices.length; x++) {
+                        copy[x] = indices[x];
+                    }
+                    indHist.add(new ArrayList<Integer>(Arrays.asList(copy)));
+                    if (tr.substring(0, 6).equalsIgnoreCase("output")) {
+                        int ind = Integer.parseInt(instructions[index].substring(instructions[index].indexOf(" ")+1));
+                        curOut += mem[ind].charAt(indices[ind]);
+                    }
+                    out.add(curOut);
+                }
+            }
             index = res.getIndex();
             password += res.getOutput();
             count++;
-        }
-        if (true) {
-            trace.add(tracify(instructions[index]));
-            Log.e("TRACE", trace.get(trace.size()-1));
         }
         Log.e("Counter", ""+count);
         Log.e("Ratio", ""+((double)count)/challenge.length());
@@ -112,7 +131,50 @@ public class PasswordData implements Parcelable
             return "variable " + ind;
         }
     }
-    public String tracify(String instr) {
+    public String valueOfIndexOfVariable(String ind, String[] mem, int[] indices) {
+        if (ind.charAt(0) == '&') {
+            return ""+indices[Integer.parseInt(ind.substring(1))];
+        } else if (ind.charAt(0) == '#') {
+            return ind.substring(1);
+        } else if (ind.charAt(0) == '@') {
+            return mem[Integer.parseInt(ind.substring(1))];
+        } else {
+            return mem[Integer.parseInt(ind)].charAt(indices[Integer.parseInt(ind)])+"";
+        }
+    }
+    public String tracify(String instr, String[] mem, int[] ind) {
+        StringTokenizer s1 = new StringTokenizer(instr);
+        String start = s1.nextToken();
+        String ret = "";
+        if (start.equals("MAP")) {
+            ret += "MAP(";
+            String next = valueOfIndexOfVariable(s1.nextToken(), mem, ind);
+            ret += next;
+            ret += ") = " + preProcess.get(next);
+        } else if (start.equals("SET")) {
+            ret = "SET variable " + s1.nextToken() + " to " + indexOfVariableToString(s1.nextToken());
+            if (s1.hasMoreTokens()) {
+                ret += " " + s1.nextToken() + " " + indexOfVariableToString(s1.nextToken());
+            }
+            if (s1.hasMoreTokens()) {
+                ret += "mod " + s1.nextToken().substring(1);
+            }
+        } else if (start.equals("GOTO")) {
+        } else if (start.equals("LABEL")) {
+        } else if (start.equals("IF")) {
+        } else if (start.equals("SHIFT")) {
+            ret = "SHIFT variable " + s1.nextToken() + " by " + s1.nextToken();
+            if (s1.hasMoreTokens()) {
+                ret += " with wraparound";
+            }
+        } else if (start.equals("PARSE")) {
+        } else if (start.equals("END")) {
+        } else if (start.equals("OUTPUT")) {
+            ret = start + " variable " + s1.nextToken();
+        }
+        return ret;
+    }
+    public String tracifyVerbose(String instr) {
     /*
             Variable = 0,1,... indices in string array
 
@@ -327,7 +389,7 @@ public class PasswordData implements Parcelable
                 break;
             case "GOTO":
                 String next = s1.nextToken();
-                ret = new Result(findLabel(next)+1,"");
+                ret = new Result(findLabel(next),"");
                 break;
             case "MAP":
                 // CHECK FIRST
