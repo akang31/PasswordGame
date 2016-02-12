@@ -12,6 +12,7 @@ import java.util.Arrays;
 
 public class PasswordTrace implements Parcelable {
     private ArrayList<String> trace;
+    private String challenge;
     private ArrayList<ArrayList<String>> memHist;
     private ArrayList<ArrayList<Integer>> indHist;
     private ArrayList<String> output;
@@ -23,13 +24,15 @@ public class PasswordTrace implements Parcelable {
             return new PasswordTrace[size];
         }
     };
-    public PasswordTrace(ArrayList<String> trace, ArrayList<ArrayList<String>> memHist, ArrayList<ArrayList<Integer>> indHist, ArrayList<String> output) {
+    public PasswordTrace(String challenge, ArrayList<String> trace, ArrayList<ArrayList<String>> memHist, ArrayList<ArrayList<Integer>> indHist, ArrayList<String> output) {
+        this.challenge=challenge;
         this.trace=trace;
         this.memHist=memHist;
         this.indHist=indHist;
         this.output=output;
     }
     public PasswordTrace(Parcel source) {
+        challenge = source.readString();
         int size = source.readInt();
         String[] temp = new String[size];
         source.readStringArray(temp);
@@ -62,6 +65,9 @@ public class PasswordTrace implements Parcelable {
         source.readStringArray(temp);
         output = new ArrayList<String>(Arrays.asList(temp));
     }
+    public String getChallenge() {
+        return challenge;
+    }
     public ArrayList<String> getTrace() {
         return trace;
     }
@@ -82,6 +88,7 @@ public class PasswordTrace implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(challenge);
         dest.writeInt(trace.size());
         String[] arr = new String[trace.size()];
         arr = trace.toArray(arr);

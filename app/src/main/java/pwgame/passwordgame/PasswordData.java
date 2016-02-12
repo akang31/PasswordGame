@@ -77,10 +77,12 @@ public class PasswordData implements Parcelable
         return trace;
     }
     public PasswordTrace getFullTrace() {
-        return new PasswordTrace(trace, memHist, indHist, out);
+        return new PasswordTrace(chlg, trace, memHist, indHist, out);
     }
+    private String chlg= "";
     public String getPassword(String challenge, boolean includeTrace) {
         String password = "";
+        chlg = challenge;
         int index = 0;
         int[] indices = new int[SIZE_OF_MEMORY];
         String[] mem = new String[SIZE_OF_MEMORY];
@@ -107,7 +109,11 @@ public class PasswordData implements Parcelable
                     indHist.add(new ArrayList<Integer>(Arrays.asList(copy)));
                     if (tr.substring(0, 6).equalsIgnoreCase("output")) {
                         int ind = Integer.parseInt(instructions[index].substring(instructions[index].indexOf(" ")+1));
-                        curOut += mem[ind].charAt(indices[ind]);
+                        if (indices[ind] >= 0) {
+                            curOut += mem[ind].charAt(indices[ind]);
+                        } else {
+                            curOut += Integer.parseInt(mem[ind]);
+                        }
                     }
                     out.add(curOut);
                 }
@@ -139,6 +145,9 @@ public class PasswordData implements Parcelable
         } else if (ind.charAt(0) == '@') {
             return mem[Integer.parseInt(ind.substring(1))];
         } else {
+            if (indices[Integer.parseInt(ind)] == -1) {
+                return mem[Integer.parseInt(ind)];
+            }
             return mem[Integer.parseInt(ind)].charAt(indices[Integer.parseInt(ind)])+"";
         }
     }
@@ -162,6 +171,19 @@ public class PasswordData implements Parcelable
         } else if (start.equals("GOTO")) {
         } else if (start.equals("LABEL")) {
         } else if (start.equals("IF")) {
+            String op = s1.nextToken();
+            ret = "IF ";
+            if (op.charAt(0) == '!') {
+                ret += "NOT ";
+                op = op.substring(1);
+            }
+            if (op.equals("EQ")) {
+                ret += valueOfIndexOfVariable(s1.nextToken(), mem, ind) + " == " + valueOfIndexOfVariable(s1.nextToken(), mem, ind);
+            } else if (op.equals("EOS")) {
+                ret += "variable " + s1.nextToken() + " at end of string";
+            } else if (op.equals("VOWEL")) {
+                ret += valueOfIndexOfVariable(s1.nextToken(), mem, ind) + " is a vowel";
+            }
         } else if (start.equals("SHIFT")) {
             ret = "SHIFT variable " + s1.nextToken() + " by " + s1.nextToken();
             if (s1.hasMoreTokens()) {
@@ -421,7 +443,11 @@ public class PasswordData implements Parcelable
             case "OUTPUT":
                 try {
                     int indx1 = Integer.parseInt(s1.nextToken());
-                    ret = new Result(ind+1, mem[indx1].charAt(indices[indx1])+"");
+                    if (indices[indx1] >= 0) {
+                        ret = new Result(ind + 1, mem[indx1].charAt(indices[indx1]) + "");
+                    } else {
+                        ret = new Result(ind + 1, mem[indx1]);
+                    }
                 } catch (Exception e) {
                     Log.e("Invalid argument", "eval");
                 }

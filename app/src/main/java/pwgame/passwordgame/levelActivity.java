@@ -134,6 +134,35 @@ public class levelActivity extends AppCompatActivity {
         lh.addView(sc);
         ll.addView(lh);
         setContentView(ll);
+        addSample();
+    }
+    private void addSample() {
+        LinearLayout add = new LinearLayout(this);
+        add.setWeightSum(3.0f);
+        Button add1 = new Button(this);
+        add1.setText("SAMPLE");
+        add1.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
+        Button add2 = new Button(this);
+        add2.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
+        add2.setText("SAMPLE");
+        add2.setTransformationMethod(null);
+        Button add3 = new Button(this);
+        add3.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), traceDisplayActivity.class);
+                intent.putExtra("trace", pwd.getFullTrace());
+                //intent.putStringArrayListExtra("trace", pwd.getTrace());
+                startActivity(intent);
+            }
+        });
+        add3.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
+        add3.setTransformationMethod(null);
+        add3.setText(getPassword("SAMPLE"));
+        add.addView(add1);
+        add.addView(add2);
+        add.addView(add3);
+        history.addView(add);
     }
     private int index = 0;
     private String[] pw = new String[]{"AMAZON", "FACEBOOK", "DROPBOX", "MSN", "INSTAGRAM", "ALIEXPRESS",

@@ -129,6 +129,21 @@ public class traceDisplayActivity extends AppCompatActivity {
 
             ll.addView(temp);
         }
+
+        LinearLayout temp1 = new LinearLayout(this);
+        temp1.setWeightSum(2.0f);
+        TextView a3 = new TextView(this);
+        a3.setText("HUM Value");
+        a3.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
+        TextView a4 = new TextView(this);
+        int mod = trace.getMemoryTrace().size()%trace.getChallenge().length();
+        a4.setText(trace.getMemoryTrace().size()/trace.getChallenge().length()+"n" + (mod==0?"":"+"+mod));
+        a4.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
+        temp1.addView(a3);
+        temp1.addView(a4);
+        ll.addView(temp1);
+
+
         ScrollView sv = new ScrollView(this);
         sv.addView(ll);
         setContentView(sv);
