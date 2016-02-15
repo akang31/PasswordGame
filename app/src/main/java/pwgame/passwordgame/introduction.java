@@ -1,6 +1,7 @@
 package pwgame.passwordgame;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -15,13 +16,15 @@ public class introduction extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String[] desc = new String[]{"Welcome to the Password Game","The purpose of this game is to familiarize you with various methods of generating passwords based on website names",
+        String[] desc = new String[]{"Welcome to the Password Game!"," ", "The purpose of this game is to familiarize you with various methods of generating passwords based on website names",
                 "You will be given website names and asked to generate passwords based on the pattern for that level",
                 "After trying these levels, we encourage you to create your own games and perhaps even use a schema to replace or improve existing passwords."};
         LinearLayout ll = new LinearLayout(this);
         ll.setOrientation(LinearLayout.VERTICAL);
         for (int x = 0; x < desc.length; x++) {
             TextView t = new TextView(this);
+            t.setTextColor(Color.BLACK);
+            t.setTextSize(20);
             t.setText(desc[x]);
             ll.addView(t);
         }
