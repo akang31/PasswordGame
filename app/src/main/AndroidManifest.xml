@@ -40,6 +40,10 @@
             android:name=".traceDisplayActivity"
             android:label="@string/title_activity_trace_display" >
         </activity>
+        <activity
+            android:name=".introduction"
+            android:label="@string/title_activity_introduction" >
+        </activity>
     </application>
 
 </manifest>

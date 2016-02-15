@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.StringTokenizer;
 
 /**
  * Created by Abraham on 2/7/2016.
@@ -79,6 +80,20 @@ public class PasswordTrace implements Parcelable {
     }
     public ArrayList<String> getOutputTrace() {
         return output;
+    }
+    private int HUM = -1;
+    public int getHUM() {
+        if (HUM != -1) {
+            return HUM;
+        }
+        int count = 0;
+        for (int x = 0; x < trace.size(); x++) {
+            String str = trace.get(x).substring(0, trace.get(x).indexOf(" "));
+            if (!str.equals("IF")) {
+                count++;
+            }
+        }
+        return count;
     }
 
     @Override

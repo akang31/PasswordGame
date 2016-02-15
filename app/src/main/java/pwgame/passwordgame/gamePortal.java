@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class gamePortal extends AppCompatActivity {
@@ -46,18 +47,23 @@ public class gamePortal extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), levelActivity.class);
-                intent.putExtra("PasswordData", pd);
-                intent.putExtra("level", level);
+                //intent.putExtra("PasswordData", pd);
+                //intent.putExtra("level", level);
+                intent.putParcelableArrayListExtra("pwd", all);
+                intent.putExtra("levelNum", level);
                 startActivity(intent);
             }
         }
     }
 
+    protected ArrayList<PasswordData> all;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         int rows = 5;
         int cols = 5;
+        all = getIntent().<PasswordData>getParcelableArrayListExtra("pwd");
+
         PasswordData[] pwd = new PasswordData[rows*cols];
         createLevels(pwd);
         LinearLayout overall = new LinearLayout(this);
@@ -104,7 +110,7 @@ public class gamePortal extends AppCompatActivity {
          *  indices[0] = 0;
          *  mem[0] = "aA1@bB2$";
          */
-        String[] instr0 = new String[]{"MAP #@ 1", "LABEL START", "OUTPUT 1", "SHIFT 1 1", "IF !EOS 1 START", "END"};
+        String[] instr0 = new String[]{"MAP #@ 1", "LABEL START1", "OUTPUT 1", "SHIFT 1 1", "IF !EOS 1 START1", "END"};
         pwd[0] = new PasswordData(map0, instr0);
 
         //Case 2: Fixed password + add exact challenge
@@ -127,7 +133,8 @@ public class gamePortal extends AppCompatActivity {
         for (int x = 0;x  < 26; x++) {
             map3.put((char)('A'+x)+"", (int)(Math.random()*10)+"");
         }
-        String[] instr3 = new String[]{"LABEL START", "IF EOS 0 END", "MAP 0 1", "OUTPUT 1", "SHIFT 0 1", "GOTO START", "LABEL END", "END"};
+        map3.put("@", "aB7@");
+        String[] instr3 = new String[]{"MAP #@ 1", "LABEL START1", "OUTPUT 1", "SHIFT 1 1", "IF !EOS 1 START1", "LABEL START", "IF EOS 0 END", "MAP 0 1", "OUTPUT 1", "SHIFT 0 1", "GOTO START", "LABEL END", "END"};
         pwd[3] = new PasswordData(map3, instr3);
 
         //Case 5: Running Sum Schema
@@ -135,10 +142,49 @@ public class gamePortal extends AppCompatActivity {
         for (int x = 0;x  < 26; x++) {
             map4.put((char)('A'+x)+"", (int)(Math.random()*10)+"");
         }
-        String[] instr4 = new String[]{"SET 2 #0", "LABEL START", "IF EOS 0 END", "MAP 0 1", "PARSE 1", "SHIFT 0 1",
+        map4.put("@", "aB7@");
+        String[] instr4 = new String[]{"MAP #@ 1", "LABEL START1", "OUTPUT 1", "SHIFT 1 1", "IF !EOS 1 START1",
+                "SET 2 #0", "LABEL START", "IF EOS 0 END", "MAP 0 1", "PARSE 1", "SHIFT 0 1",
                 "SET 2 2 + 1 m10", "OUTPUT 2", "GOTO START", "LABEL END", "END"};
         pwd[4] = new PasswordData(map4, instr4);
 
+        //Case 6: Vowels only
+        HashMap<String,String> map5 = new HashMap<String,String>();
+        map5.put("A", "1");
+        map5.put("E", "2");
+        map5.put("I", "3");
+        map5.put("O", "4");
+        map5.put("U", "5");
+        map5.put("@", "aB7@");
+        String[] instr5 = new String[]{"MAP #@ 1", "LABEL START1", "OUTPUT 1", "SHIFT 1 1", "IF !EOS 1 START1",
+                "LABEL START", "IF EOS 0 END", "MAP 0 1", "SHIFT 0 1", "IF EQ &1 #-2 START", "OUTPUT 1", "GOTO START", "LABEL END", "END"};
+        pwd[5] = new PasswordData(map5, instr5);
+
+        //Case 6: Vowels only, running sum
+        HashMap<String,String> map6 = new HashMap<String,String>();
+        map6.put("A", "1");
+        map6.put("E", "2");
+        map6.put("I", "3");
+        map6.put("O", "4");
+        map6.put("U", "5");
+        map6.put("@", "aB7@");
+        String[] instr6 = new String[]{"MAP #@ 1", "LABEL START1", "OUTPUT 1", "SHIFT 1 1", "IF !EOS 1 START1",
+                "SET 2 #0", "LABEL START", "IF EOS 0 END", "MAP 0 1", "SHIFT 0 1", "IF EQ &1 #-2 START",
+                "PARSE 1", "SET 2 2 + 1 m10", "OUTPUT 2", "GOTO START", "LABEL END", "END"};
+        pwd[6] = new PasswordData(map6, instr6);
+
+        //Case 7: Vowels only, running sum, start from last
+        HashMap<String,String> map7 = new HashMap<String,String>();
+        map7.put("A", "1");
+        map7.put("E", "2");
+        map7.put("I", "3");
+        map7.put("O", "4");
+        map7.put("U", "5");
+        map7.put("@", "aB7@");
+        String[] instr7 = new String[]{"MAP #@ 1", "LABEL START1", "OUTPUT 1", "SHIFT 1 1", "IF !EOS 1 START1",
+                "SET 2 #0", "LABEL START", "IF EOS 0 END", "MAP 0 1", "SHIFT 0 1", "IF EQ &1 #-2 START",
+                "PARSE 1", "SET 2 2 + 1 m10", "OUTPUT 2", "GOTO START", "LABEL END", "END"};
+        pwd[7] = new PasswordData(map7, instr7);
 
         //Case 1: Fixed Password
         HashMap<String, String> map10 = new HashMap<String, String>();

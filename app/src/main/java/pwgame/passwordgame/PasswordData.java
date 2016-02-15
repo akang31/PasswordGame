@@ -21,6 +21,7 @@ public class PasswordData implements Parcelable
     private ArrayList<ArrayList<String>> memHist;
     private ArrayList<ArrayList<Integer>> indHist;
     private ArrayList<String> out;
+    private int Q = 2;
     private final String[] VOWEL_VALUES = new String[]{"A", "E", "I", "O", "U", "a", "e", "i", "o", "u"};
     private final HashSet<String> VOWELS = new HashSet<String>(Arrays.asList(VOWEL_VALUES));
     private HashMap<String, String> preProcess;
@@ -49,6 +50,7 @@ public class PasswordData implements Parcelable
         instructions = new String[lenOfInstructions];
         source.readStringArray(instructions);
         description = source.readString();
+        Q = source.readInt();
     }
     public PasswordData(HashMap<String, String> preProcess, String[] instructions) {
         this.preProcess = preProcess;
@@ -58,6 +60,23 @@ public class PasswordData implements Parcelable
         this.preProcess = preProcess;
         this.instructions = instructions;
         this.description = description;
+    }
+    public PasswordData(HashMap<String, String> preProcess, String[] instructions, int Q) {
+        this.preProcess = preProcess;
+        this.instructions = instructions;
+        this.Q = Q;
+    }
+    public PasswordData(HashMap<String, String> preProcess, String[] instructions, String description, int Q) {
+        this.preProcess = preProcess;
+        this.instructions = instructions;
+        this.Q = Q;
+        this.description = description;
+    }
+    public String getDescription() {
+        return description;
+    }
+    public int getQ() {
+        return Q;
     }
     private class Result {
         private int index;
@@ -98,7 +117,8 @@ public class PasswordData implements Parcelable
             Log.e("RUNNING", index+"");
             Result res = run(index, indices, mem);
             if (true) {
-                String tr = tracify(instructions[index], mem, indices);
+                //Hack: index < res.getIndex(). Assumes forward action implies taking an if statement. Very easy to make counterexample, but should work for now
+                String tr = tracify(instructions[index], mem, indices, index < res.getIndex());
                 if (!tr.equals("")) {
                     trace.add(tr);
                     memHist.add(new ArrayList<String>(Arrays.asList(Arrays.copyOf(mem, mem.length))));
@@ -151,7 +171,7 @@ public class PasswordData implements Parcelable
             return mem[Integer.parseInt(ind)].charAt(indices[Integer.parseInt(ind)])+"";
         }
     }
-    public String tracify(String instr, String[] mem, int[] ind) {
+    public String tracify(String instr, String[] mem, int[] ind, boolean ifUsed) {
         StringTokenizer s1 = new StringTokenizer(instr);
         String start = s1.nextToken();
         String ret = "";
@@ -591,5 +611,6 @@ public class PasswordData implements Parcelable
         dest.writeInt(instructions.length);
         dest.writeStringArray(instructions);
         dest.writeString(description);
+        dest.writeInt(Q);
     }
 }

@@ -136,8 +136,8 @@ public class traceDisplayActivity extends AppCompatActivity {
         a3.setText("HUM Value");
         a3.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
         TextView a4 = new TextView(this);
-        int mod = trace.getMemoryTrace().size()%trace.getChallenge().length();
-        a4.setText(trace.getMemoryTrace().size()/trace.getChallenge().length()+"n" + (mod==0?"":"+"+mod));
+        int mod = trace.getHUM()%trace.getChallenge().length();
+        a4.setText(trace.getHUM()/trace.getChallenge().length()+"n" + (mod==0?"":"+"+mod));
         a4.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
         temp1.addView(a3);
         temp1.addView(a4);

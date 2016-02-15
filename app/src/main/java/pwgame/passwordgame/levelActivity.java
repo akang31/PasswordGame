@@ -1,6 +1,7 @@
 package pwgame.passwordgame;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -30,8 +32,13 @@ public class levelActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        pwd = getIntent().getExtras().getParcelable("PasswordData");
-        levelNum = getIntent().getExtras().getInt("level")+1;
+        if (getIntent().hasExtra("PasswordData")) {
+            pwd = getIntent().getExtras().getParcelable("PasswordData");
+            levelNum = getIntent().getExtras().getInt("level")+1;
+        } else {
+            levelNum = getIntent().getExtras().getInt("levelNum")+1;
+            pwd = (getIntent().<PasswordData>getParcelableArrayListExtra("pwd")).get(levelNum-1);
+        }
         LinearLayout ll = new LinearLayout(this);
         ll.setOrientation(LinearLayout.VERTICAL);
         ll.setWeightSum(2.0f);
@@ -44,6 +51,8 @@ public class levelActivity extends AppCompatActivity {
         head.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.2f));
         ll.addView(head);
         TextView fill2 = new TextView(this);
+        fill2.setText("Q = " + pwd.getQ());
+        fill2.setGravity(Gravity.CENTER);
         fill2.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.3f));
         ll.addView(fill2);
         TextView hint = new TextView(this);
@@ -74,7 +83,12 @@ public class levelActivity extends AppCompatActivity {
 
         //setContentView(R.layout.activity_level);
     }
+    private ArrayList<String> challenges, guesses, answers;
+    private TextView score;
     private void createScreen() {
+        challenges = new ArrayList<String>();
+        guesses = new ArrayList<String>();
+        answers = new ArrayList<String>();
         LinearLayout ll = new LinearLayout(this);
         ll.setOrientation(LinearLayout.VERTICAL);
         ll.setWeightSum(2.0f);
@@ -85,12 +99,18 @@ public class levelActivity extends AppCompatActivity {
         uh.setOrientation(LinearLayout.VERTICAL);
         challenge = new TextView(this);
         Collections.shuffle(Arrays.asList(pw));
-        challenge.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1.0f));
+        challenge.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.6f));
         challenge.setText(pw[index++]);
         challenge.setTextSize(30);
         challenge.setTypeface(null, Typeface.BOLD);
+        challenge.setTextColor(Color.BLACK);
         challenge.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         uh.addView(challenge);
+        score = new TextView(this);
+        score.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.4f));
+        score.setText("Score: 0       Q: " + pwd.getQ());
+        score.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        uh.addView(score);
         guess = new EditText(this);
         guess.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.6f));
         uh.addView(guess);
@@ -144,7 +164,7 @@ public class levelActivity extends AppCompatActivity {
         add1.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
         Button add2 = new Button(this);
         add2.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
-        add2.setText("SAMPLE");
+        add2.setText("");
         add2.setTransformationMethod(null);
         Button add3 = new Button(this);
         add3.setOnClickListener(new View.OnClickListener(){
@@ -173,10 +193,14 @@ public class levelActivity extends AppCompatActivity {
         String curChal = challenge.getText().toString();
         String response = getPassword(curChal);
         String theirGuess = guess.getText().toString();
+        challenges.add(curChal);
+        guesses.add(theirGuess);
+        answers.add(response);
         if (response.equals(theirGuess)) {
-            finish();
+            doFinish();
         }
         challenge.setText(pw[index++]);
+        score.setText("Score: "+ challenges.size() + "       Q: " + pwd.getQ());
         index %= pw.length;
         guess.setText("");
         LinearLayout add = new LinearLayout(this);
@@ -206,6 +230,16 @@ public class levelActivity extends AppCompatActivity {
         add.addView(add3);
         history.addView(add);
     }
+    private void doFinish() {
+        Intent intent = new Intent(this, postLevelActivity.class);
+        intent.putParcelableArrayListExtra("pwd", this.getIntent().<PasswordData>getParcelableArrayListExtra("pwd"));
+        intent.putExtra("levelNumber", levelNum-1);
+        intent.putStringArrayListExtra("guesses", guesses);
+        intent.putStringArrayListExtra("challenges", challenges);
+        intent.putStringArrayListExtra("answers", answers);
+        startActivity(intent);
+        finish();
+    }
     private String getPassword(String chal) {
         return pwd.getPassword(chal, false);
     }
@@ -223,6 +257,10 @@ public class levelActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        Intent intent = new Intent(this, gamePortal.class);
+        intent.putParcelableArrayListExtra("pwd",getIntent().<PasswordData>getParcelableArrayListExtra("pwd"));
+        startActivity(intent);
+        finish();
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
