@@ -18,11 +18,6 @@
         <activity
             android:name=".mainPage"
             android:label="@string/title_activity_main_page" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".schemaLibrary"
@@ -43,6 +38,15 @@
         <activity
             android:name=".introduction"
             android:label="@string/title_activity_introduction" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".endGame"
+            android:label="@string/title_activity_end_game" >
         </activity>
     </application>
 

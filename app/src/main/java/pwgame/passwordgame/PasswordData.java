@@ -16,7 +16,7 @@ import java.util.StringTokenizer;
 public class PasswordData implements Parcelable
 {
     private String description;
-    private final int SIZE_OF_MEMORY = 3;
+    private int SIZE_OF_MEMORY = 3;
     private ArrayList<String> trace;
     private ArrayList<ArrayList<String>> memHist;
     private ArrayList<ArrayList<Integer>> indHist;
@@ -51,6 +51,7 @@ public class PasswordData implements Parcelable
         source.readStringArray(instructions);
         description = source.readString();
         Q = source.readInt();
+        SIZE_OF_MEMORY = source.readInt();
     }
     public PasswordData(HashMap<String, String> preProcess, String[] instructions) {
         this.preProcess = preProcess;
@@ -71,6 +72,14 @@ public class PasswordData implements Parcelable
         this.instructions = instructions;
         this.Q = Q;
         this.description = description;
+    }
+    public PasswordData(HashMap<String, String> preProcess, String[] instructions, String description, int Q, int k) {
+        this.preProcess = preProcess;
+        this.instructions = instructions;
+        this.Q = Q;
+        this.description = description;
+        this.SIZE_OF_MEMORY = k;
+        Log.e("SIZE CHANGED!", SIZE_OF_MEMORY+"");
     }
     public String getDescription() {
         return description;
@@ -105,6 +114,7 @@ public class PasswordData implements Parcelable
         int index = 0;
         int[] indices = new int[SIZE_OF_MEMORY];
         String[] mem = new String[SIZE_OF_MEMORY];
+        Log.e("SIZE!", SIZE_OF_MEMORY +"");
         indices[0] = 0;
         mem[0] = challenge;
         int count = 0;
@@ -171,6 +181,24 @@ public class PasswordData implements Parcelable
             return mem[Integer.parseInt(ind)].charAt(indices[Integer.parseInt(ind)])+"";
         }
     }
+    public String traceIf(StringTokenizer s1, String[] mem, int[] ind) {
+        String op = s1.nextToken();
+        String ret = "IF ";
+        if (op.charAt(0) == '!') {
+            ret += "NOT ";
+            op = op.substring(1);
+        }
+        if (op.equals("EQ")) {
+            ret += valueOfIndexOfVariable(s1.nextToken(), mem, ind) + " == " + valueOfIndexOfVariable(s1.nextToken(), mem, ind);
+        } else if (op.equals("EOS")) {
+            ret += "variable " + s1.nextToken() + " at end of string";
+        } else if (op.equals("VOWEL")) {
+            ret += valueOfIndexOfVariable(s1.nextToken(), mem, ind) + " is a vowel";
+        } else if (op.equals("CONTAINS")) {
+            ret += "map contains " + valueOfIndexOfVariable(s1.nextToken(),mem,ind);
+        }
+        return ret;
+    }
     public String tracify(String instr, String[] mem, int[] ind, boolean ifUsed) {
         StringTokenizer s1 = new StringTokenizer(instr);
         String start = s1.nextToken();
@@ -191,18 +219,16 @@ public class PasswordData implements Parcelable
         } else if (start.equals("GOTO")) {
         } else if (start.equals("LABEL")) {
         } else if (start.equals("IF")) {
-            String op = s1.nextToken();
-            ret = "IF ";
-            if (op.charAt(0) == '!') {
-                ret += "NOT ";
-                op = op.substring(1);
-            }
-            if (op.equals("EQ")) {
-                ret += valueOfIndexOfVariable(s1.nextToken(), mem, ind) + " == " + valueOfIndexOfVariable(s1.nextToken(), mem, ind);
-            } else if (op.equals("EOS")) {
-                ret += "variable " + s1.nextToken() + " at end of string";
-            } else if (op.equals("VOWEL")) {
-                ret += valueOfIndexOfVariable(s1.nextToken(), mem, ind) + " is a vowel";
+            ret = traceIf(s1, mem, ind);
+        } else if (start.equals("LOOPSTART")) {
+            ret += instr;
+        } else if (start.equals("LOOPEND")) {
+            String name1 = s1.nextToken();
+            if (evalIf(s1,mem,ind)) {
+                s1 = new StringTokenizer(instr);
+                s1.nextToken();
+                s1.nextToken();
+                ret = "LOOPEND "+name1 + " " + traceIf(s1, mem, ind);
             }
         } else if (start.equals("SHIFT")) {
             ret = "SHIFT variable " + s1.nextToken() + " by " + s1.nextToken();
@@ -302,6 +328,8 @@ public class PasswordData implements Parcelable
                 ret += "variable " + s1.nextToken() + " is at end of string";
             } else if (next.equals("VOWEL")) {
                 ret += "variable " + s1.nextToken() + " is a vowel";
+            } else if (next.equals("CONTAINS")) {
+
             }
             ret += " then goto label " + s1.nextToken();
         } else if (start.equals("SHIFT")) {
@@ -327,14 +355,42 @@ public class PasswordData implements Parcelable
     private boolean done(int index) {
         return instructions[index].equals("END");
     }
-    private int findLabel(String label) {
+    private int findLabel(String label, String keyword) {
         for (int x = 0; x < instructions.length; x++) {
             StringTokenizer s2 = new StringTokenizer(instructions[x]);
-            if (s2.nextToken().equals("LABEL") && s2.nextToken().equals(label)) {
+            if (s2.nextToken().equals(keyword) && s2.nextToken().equals(label)) {
                 return x;
             }
         }
         return -1;
+    }
+    private boolean evalIf(StringTokenizer s1, String[] mem, int[] indices) {
+        String tok = s1.nextToken();
+        boolean flip = false;
+        boolean rett = false;
+        if (tok.charAt(0) == '!') {
+            flip = true;
+            tok = tok.substring(1);
+        }
+        if (tok.equals("EOS")) {
+            int nxt = Integer.parseInt(s1.nextToken());
+            rett = indices[nxt] >= mem[nxt].length();
+            Log.e("IF EOS", rett+"");
+        } else if (tok.equals("VOWEL")) {
+            int nxt = Integer.parseInt(s1.nextToken());
+            rett = VOWELS.contains(mem[nxt].charAt(indices[nxt])+"");
+        } else if (tok.equals("EQ")) {
+            char[] c1 = new char[]{0};
+            char[] c2 = new char[]{0};
+            variable(c1, s1.nextToken(), indices, mem);
+            variable(c2, s1.nextToken(), indices, mem);
+            rett = c1[0] == c2[0];
+            Log.e("IF EQ", (int)c1[0] + " " + (int)c2[0] + " " + rett);
+        } else if (tok.equals("CONTAINS")) {
+            int nxt = Integer.parseInt(s1.nextToken());
+            rett = preProcess.containsKey(mem[nxt].charAt(indices[nxt])+"");
+        }
+        return rett^flip;
     }
     private Result run(int ind, int[] indices, String[] mem) {
         /*
@@ -369,7 +425,13 @@ public class PasswordData implements Parcelable
                     EQ [indexOfVariable*] [indexOfVariable*]
                     EOS [indexOfVariable] : checks if it is the end of string
                     VOWEL [indexOfVariable] : checks if the character is a vowel
+                    CONTAINS [indexOfVariable] : checks if current map contains character at variable
                     ![statement] : negate
+
+            LOOPSTART [loopName]
+            LOOPEND [loopName] [CONDITION*]
+                Creates a loop named loopName. The condition follows same syntax as IF
+                If loopend is met, the loop ends. If not, it goes back to LOOPSTART
 
             Shift a pointer in memory: SHIFT [indexOfVariable] [number shifted, signed] [wrap]
                 if anything is put in for wrap, the shift will wrap around.
@@ -391,30 +453,16 @@ public class PasswordData implements Parcelable
         Result ret = new Result(ind+1, "");
         switch (swtch) {
             case "IF":
-                String tok = s1.nextToken();
-                boolean flip = false;
-                boolean rett = false;
-                if (tok.charAt(0) == '!') {
-                    flip = true;
-                    tok = tok.substring(1);
+                if (evalIf(s1, mem, indices)) {
+                    ret = new Result(findLabel(s1.nextToken(), "LABEL"),"");
                 }
-                if (tok.equals("EOS")) {
-                    int nxt = Integer.parseInt(s1.nextToken());
-                    rett = indices[nxt] >= mem[nxt].length();
-                    Log.e("IF EOS", rett+"");
-                } else if (tok.equals("VOWEL")) {
-                    int nxt = Integer.parseInt(s1.nextToken());
-                    rett = VOWELS.contains(mem[nxt].charAt(indices[nxt])+"");
-                } else if (tok.equals("EQ")) {
-                    char[] c1 = new char[]{0};
-                    char[] c2 = new char[]{0};
-                    variable(c1, s1.nextToken(), indices, mem);
-                    variable(c2, s1.nextToken(), indices, mem);
-                    rett = c1[0] == c2[0];
-                    Log.e("IF EQ", (int)c1[0] + " " + (int)c2[0] + " " + rett);
-                }
-                if (rett^flip) {
-                    ret = new Result(findLabel(s1.nextToken()),"");
+                break;
+            case "LOOPSTART":
+                break;
+            case "LOOPEND":
+                String name1 = s1.nextToken();
+                if (!s1.hasMoreTokens() || s1.hasMoreTokens() && !evalIf(s1,mem,indices)) {
+                    ret = new Result(findLabel(name1, "LOOPSTART")+1, "");
                 }
                 break;
             case "SHIFT":
@@ -431,7 +479,7 @@ public class PasswordData implements Parcelable
                 break;
             case "GOTO":
                 String next = s1.nextToken();
-                ret = new Result(findLabel(next),"");
+                ret = new Result(findLabel(next, "LABEL"),"");
                 break;
             case "MAP":
                 // CHECK FIRST
@@ -612,5 +660,6 @@ public class PasswordData implements Parcelable
         dest.writeStringArray(instructions);
         dest.writeString(description);
         dest.writeInt(Q);
+        dest.writeInt(SIZE_OF_MEMORY);
     }
 }

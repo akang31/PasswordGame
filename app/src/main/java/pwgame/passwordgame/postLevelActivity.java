@@ -1,8 +1,10 @@
 package pwgame.passwordgame;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,7 +23,21 @@ public class postLevelActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         int levelNum = getIntent().getExtras().getInt("levelNumber");
         PasswordData pwd = getIntent().<PasswordData>getParcelableArrayListExtra("pwd").get(levelNum);
-        int score = 1;
+        ArrayList<String> challenges = getIntent().getStringArrayListExtra("challenges");
+        int score = challenges.size();
+        SharedPreferences sp = getSharedPreferences("scores", 0);
+        if (sp.contains("level"+levelNum)){
+            int a = sp.getInt("level"+levelNum, 1000000);
+            if (score < a) {
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putInt("level"+levelNum, score);
+                editor.commit();
+            }
+        } else {
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putInt("level"+levelNum, score);
+            editor.commit();
+        }
         LinearLayout ll = new LinearLayout(this);
         ll.setWeightSum(1.0f);
         ll.setOrientation(LinearLayout.VERTICAL);
@@ -61,7 +77,6 @@ public class postLevelActivity extends AppCompatActivity {
         ScrollView sv = new ScrollView(this);
         LinearLayout in = new LinearLayout(this);
         in.setOrientation(LinearLayout.VERTICAL);
-        ArrayList<String> challenges = getIntent().getStringArrayListExtra("challenges");
         ArrayList<String> guesses = getIntent().getStringArrayListExtra("guesses");
         ArrayList<String> answers = getIntent().getStringArrayListExtra("answers");
         for (int x = 0; x < challenges.size(); x++) {
@@ -99,11 +114,20 @@ public class postLevelActivity extends AppCompatActivity {
         nextLevel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), levelActivity.class);
-                intent.putParcelableArrayListExtra("pwd", getIntent().<PasswordData>getParcelableArrayListExtra("pwd"));
-                intent.putExtra("levelNum", getIntent().getExtras().getInt("levelNumber") + 1);
-                startActivity(intent);
-                finish();
+                ArrayList<PasswordData> arr = getIntent().<PasswordData>getParcelableArrayListExtra("pwd");
+                int levelNum = getIntent().getExtras().getInt("levelNumber")+1;
+                Log.e("Check", levelNum + " " + arr.size());
+                if (levelNum >= arr.size()) {
+                    Intent intent = new Intent(v.getContext(), endGame.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Intent intent = new Intent(v.getContext(), levelActivity.class);
+                    intent.putParcelableArrayListExtra("pwd", arr);
+                    intent.putExtra("levelNum", getIntent().getExtras().getInt("levelNumber") + 1);
+                    startActivity(intent);
+                    finish();
+                }
             }
         });
         ll.addView(nextLevel);
@@ -117,7 +141,7 @@ public class postLevelActivity extends AppCompatActivity {
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("message/rfc822");
                 intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"akang31@gatech.edu", "vempala@cc.gatech.edu"});
-                intent.putExtra(Intent.EXTRA_SUBJECT, "Level " + (getIntent().getExtras().getInt("levelNumber")+1) + " feedback");
+                intent.putExtra(Intent.EXTRA_SUBJECT, "Password Game: Level " + (getIntent().getExtras().getInt("levelNumber")+1) + " feedback");
                 try {
                     startActivity(Intent.createChooser(intent, "Send feedback"));
                 } catch (Exception e) {

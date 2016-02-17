@@ -10,4 +10,5 @@
     <string name="title_activity_post_level">postLevelActivity</string>
     <string name="title_activity_trace_display">traceDisplayActivity</string>
     <string name="title_activity_introduction">introduction</string>
+    <string name="title_activity_end_game">endGame</string>
 </resources>

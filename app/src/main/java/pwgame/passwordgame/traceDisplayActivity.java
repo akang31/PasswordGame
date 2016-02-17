@@ -3,6 +3,7 @@ package pwgame.passwordgame;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -65,7 +66,8 @@ public class traceDisplayActivity extends AppCompatActivity {
         public void onClick(View v) {
             ll.removeViewAt(index);
             LinearLayout add = new LinearLayout(v.getContext());
-            add.setWeightSum(3.0f);
+            add.setWeightSum(mem.size()*1.0f);
+            Log.e("SIZE", mem.size()+"");
             for (int x = 0; x < mem.size(); x++) {
                 Button add1 = new Button(v.getContext());
                 String txt = "";
@@ -104,13 +106,27 @@ public class traceDisplayActivity extends AppCompatActivity {
         temp.addView(a2);
         ll.addView(temp);
 
+        LinearLayout temp1 = new LinearLayout(this);
+        temp1.setWeightSum(2.0f);
+        TextView a3 = new TextView(this);
+        a3.setText("HUM Value");
+        a3.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
+        TextView a4 = new TextView(this);
+        int mod = trace.getHUM()%trace.getChallenge().length();
+        a4.setText(trace.getHUM() + " = " + trace.getHUM()/trace.getChallenge().length()+"n" + (mod==0?"":"+"+mod));
+        a4.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
+        temp1.addView(a3);
+        temp1.addView(a4);
+        ll.addView(temp1);
+
+
         for (int x = 0; x < trace.getTrace().size(); x++) {
             temp = new LinearLayout(this);
             temp.setWeightSum(2.0f);
             Button add = new Button(this);
             add.setText(trace.getTrace().get(x));
             add.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
-            add.setOnClickListener(new SwitchListener(x + 1, trace.getMemoryTrace().get(x), trace.getPointerTrace().get(x), trace.getTrace().get(x), trace.getOutputTrace().get(x)));
+            add.setOnClickListener(new SwitchListener(x+2, trace.getMemoryTrace().get(x), trace.getPointerTrace().get(x), trace.getTrace().get(x), trace.getOutputTrace().get(x)));
             add.setTransformationMethod(null);
             temp.addView(add);
 /*
@@ -123,25 +139,12 @@ public class traceDisplayActivity extends AppCompatActivity {
             add = new Button(this);
             add.setText(trace.getOutputTrace().get(x));
             add.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
-            add.setOnClickListener(new SwitchListener(x+1, trace.getMemoryTrace().get(x), trace.getPointerTrace().get(x), trace.getTrace().get(x), trace.getOutputTrace().get(x)));
+            add.setOnClickListener(new SwitchListener(x+2, trace.getMemoryTrace().get(x), trace.getPointerTrace().get(x), trace.getTrace().get(x), trace.getOutputTrace().get(x)));
             add.setTransformationMethod(null);
             temp.addView(add);
 
             ll.addView(temp);
         }
-
-        LinearLayout temp1 = new LinearLayout(this);
-        temp1.setWeightSum(2.0f);
-        TextView a3 = new TextView(this);
-        a3.setText("HUM Value");
-        a3.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
-        TextView a4 = new TextView(this);
-        int mod = trace.getHUM()%trace.getChallenge().length();
-        a4.setText(trace.getHUM()/trace.getChallenge().length()+"n" + (mod==0?"":"+"+mod));
-        a4.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
-        temp1.addView(a3);
-        temp1.addView(a4);
-        ll.addView(temp1);
 
 
         ScrollView sv = new ScrollView(this);
