@@ -261,7 +261,7 @@ public class levelActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        Intent intent = new Intent(this, gamePortal.class);
+        Intent intent = new Intent(this, introduction.class);
         intent.putParcelableArrayListExtra("pwd",getIntent().<PasswordData>getParcelableArrayListExtra("pwd"));
         startActivity(intent);
         finish();
