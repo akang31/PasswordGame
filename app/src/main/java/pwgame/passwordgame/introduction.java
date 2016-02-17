@@ -3,8 +3,10 @@ package pwgame.passwordgame;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,23 +16,37 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class introduction extends AppCompatActivity {
-
+    private PasswordData[] all;
     private int levelCount = 11;
+    private class levelGo implements View.OnClickListener {
+        int level;
+        public levelGo(int level) {
+            this.level=level;
+        }
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(v.getContext(), levelActivity.class);
+            intent.putParcelableArrayListExtra("pwd", new ArrayList<PasswordData>(Arrays.asList(all)));
+            intent.putExtra("levelNum", level);
+            startActivity(intent);
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String[] desc = new String[]{"Welcome to the Password Game!"," ", "The purpose of this game is to familiarize you with various methods of generating passwords based on website names",
-                "You will be given website names and asked to generate passwords based on the pattern for that level",
-                "After trying these levels, we encourage you to create your own games and perhaps even use a schema to replace or improve existing passwords."};
+        String[] desc = new String[]{"Welcome to the Password Game!"," ", "The purpose of this game is to guess passwords for various websites using as few guesses as possible.",
+                "Each level uses a different rule (schema) for the true passwords. Make your best guess for each website that you are shown!",
+                "After trying these levels, we encourage you to create your own password schema."};
         LinearLayout ll = new LinearLayout(this);
         ll.setOrientation(LinearLayout.VERTICAL);
         for (int x = 0; x < desc.length; x++) {
             TextView t = new TextView(this);
             t.setTextColor(Color.BLACK);
-            t.setTextSize(20);
+            t.setTextSize(18);
             t.setText(desc[x]);
             ll.addView(t);
         }
@@ -56,15 +72,17 @@ public class introduction extends AppCompatActivity {
             }
         });
         ll.addView(go);
-        String[] header = new String[]{"Level1", "Par Score", "High Score"};
+        String[] header = new String[]{"Level Number", "Par Score", "Best Score"};
         LinearLayout head = new LinearLayout(this);
         head.setWeightSum(3.0f);
-        PasswordData[] all = new PasswordData[levelCount];
+        all = new PasswordData[levelCount];
         createLevels(all);
         for (int x = 0; x < header.length; x++) {
-            Button a1 = new Button(this);
-            a1.setText("Level " + (x+1));
+            TextView a1 = new TextView(this);
+            a1.setText(header[x]);
             a1.setTransformationMethod(null);
+            a1.setTypeface(null, Typeface.BOLD);
+            a1.setGravity(Gravity.CENTER);
             a1.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
             head.addView(a1);
         }
@@ -73,18 +91,22 @@ public class introduction extends AppCompatActivity {
             LinearLayout add = new LinearLayout(this);
             add.setWeightSum(3.0f);
 
-            TextView a1 = new TextView(this);
+            Button a1 = new Button(this);
             a1.setText("Level " + (x + 1));
             a1.setTransformationMethod(null);
             a1.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
+            a1.setOnClickListener(new levelGo(x));
             add.addView(a1);
 
             TextView a2 = new TextView(this);
             a2.setText(all[x].getQ()+"");
+            a2.setGravity(Gravity.CENTER);
             a2.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
             add.addView(a2);
 
             TextView a3 = new TextView(this);
+            a3.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
+            a3.setGravity(Gravity.CENTER);
             SharedPreferences sp = getSharedPreferences("scores", 0);
             if (sp.contains("level"+x)) {
                 a3.setText(sp.getInt("level"+x,-1)+"");

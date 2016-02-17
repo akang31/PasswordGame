@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -94,17 +95,6 @@ public class traceDisplayActivity extends AppCompatActivity {
         ll = new LinearLayout(this);
         ll.setOrientation(LinearLayout.VERTICAL);
 
-        LinearLayout temp = new LinearLayout(this);
-        temp.setWeightSum(2.0f);
-        TextView a1 = new TextView(this);
-        a1.setText("Instruction");
-        a1.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
-        TextView a2 = new TextView(this);
-        a2.setText("Output");
-        a2.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
-        temp.addView(a1);
-        temp.addView(a2);
-        ll.addView(temp);
 
         LinearLayout temp1 = new LinearLayout(this);
         temp1.setWeightSum(2.0f);
@@ -113,11 +103,29 @@ public class traceDisplayActivity extends AppCompatActivity {
         a3.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
         TextView a4 = new TextView(this);
         int mod = trace.getHUM()%trace.getChallenge().length();
-        a4.setText(trace.getHUM() + " = " + trace.getHUM()/trace.getChallenge().length()+"n" + (mod==0?"":"+"+mod));
+        //a4.setText(trace.getHUM() + " = " + trace.getHUM()/trace.getChallenge().length()+"n" + (mod==0?"":"+"+mod));
+        a4.setText(trace.getHUM()+"");
         a4.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
+        a3.setGravity(Gravity.CENTER);
+        a4.setGravity(Gravity.CENTER);
         temp1.addView(a3);
         temp1.addView(a4);
         ll.addView(temp1);
+
+        LinearLayout temp = new LinearLayout(this);
+        temp.setWeightSum(2.0f);
+        TextView a1 = new TextView(this);
+        a1.setText("Instruction");
+        a1.setGravity(Gravity.CENTER);
+        a1.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
+        TextView a2 = new TextView(this);
+        a2.setText("Output");
+        a2.setGravity(Gravity.CENTER);
+        a2.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
+        temp.addView(a1);
+        temp.addView(a2);
+        ll.addView(temp);
+
 
 
         for (int x = 0; x < trace.getTrace().size(); x++) {
