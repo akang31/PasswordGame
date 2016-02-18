@@ -206,7 +206,7 @@ public class levelActivity extends AppCompatActivity {
             doFinish();
         }
         challenge.setText(pw[index++]);
-        score.setText("Score: "+ challenges.size() + "       Q: " + pwd.getQ());
+        score.setText("Score: "+ challenges.size() + "       Par score: " + pwd.getQ());
         index %= pw.length;
         guess.setText("");
         LinearLayout add = new LinearLayout(this);

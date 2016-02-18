@@ -136,23 +136,23 @@ public class introduction extends AppCompatActivity {
          *  mem[0] = "aA1@bB2$";
          */
         //String[] instr0 = new String[]{"MAP #@ 1", "LABEL START1", "OUTPUT 1", "SHIFT 1 1", "IF !EOS 1 START1", "END"};
-        String[] instr0 = new String[]{"MAP #@ 1", "LOOPSTART l1", "OUTPUT 1", "SHIFT 1 1", "LOOPEND l1 EOS 1", "END"};
-        pwd[0] = new PasswordData(map0, instr0, "Fixed password.", 2);
+        String[] instr0 = new String[]{"MAP #@ 1", "LOOPSTART L1", "OUTPUT 1", "SHIFT 1 1", "LOOPEND L1 EOS 1", "END"};
+        pwd[0] = new PasswordData(map0, instr0, "Password = Fixed string.", 2);
 
         //Case 2: Fixed password + add exact challenge
         HashMap<String, String> map1 = new HashMap<String, String>();
         map1.put("@","aB7@");
-        String[] instr1 = new String[]{"LOOPSTART l1", "OUTPUT 0", "SHIFT 0 1", "LOOPEND l1 EOS 0","MAP #@ 1", "LOOPSTART l2", "OUTPUT 1", "SHIFT 1 1", "LOOPEND l2 EOS 1", "END"};
-        pwd[1] = new PasswordData(map1, instr1, "Fixed password and website name.", 2);
+        String[] instr1 = new String[]{"LOOPSTART L1", "OUTPUT 0", "SHIFT 0 1", "LOOPEND L1 EOS 0","MAP #@ 1", "LOOPSTART L2", "OUTPUT 1", "SHIFT 1 1", "LOOPEND L2 EOS 1", "END"};
+        pwd[1] = new PasswordData(map1, instr1, "Password = Website name + fixed string.", 2);
 
         //Case 3: Start from last character
         HashMap<String, String> map2 = new HashMap<String, String>();
         map2.put("@", "aB7@");
-        String[] instr2 = new String[]{"LOOPSTART l1", "SHIFT 0 1", "LOOPEND l1 EOS 0",
+        String[] instr2 = new String[]{"LOOPSTART L1", "SHIFT 0 1", "LOOPEND L1 EOS 0",
                 "LABEL START3", "SHIFT 0 -1", "SET 2 &0",
-                "LOOPSTART l2", "OUTPUT 0", "SHIFT 0 1 MOD", "LOOPEND l2 EQ &0 2",
-                "MAP #@ 1", "LOOPSTART l3", "OUTPUT 1", "SHIFT 1 1", "LOOPEND l3 EOS 1", "END"};
-        pwd[2] = new PasswordData(map2, instr2, "Fixed password and website name, but start from the last character.", 2);
+                "LOOPSTART L2", "OUTPUT 0", "SHIFT 0 1 MOD", "LOOPEND L2 EQ &0 2",
+                "MAP #@ 1", "LOOPSTART L3", "OUTPUT 1", "SHIFT 1 1", "LOOPEND L3 EOS 1", "END"};
+        pwd[2] = new PasswordData(map2, instr2, "Password = Website name starting from the last character + fixed string.", 2);
 
         //Case 4: Letters to Digits Schema
         HashMap<String, String> map3 = new HashMap<String, String>();
@@ -164,8 +164,8 @@ public class introduction extends AppCompatActivity {
             map3.put(vowels[x], "1");
         }
         map3.put("@", "aB7@");
-        String[] instr3 = new String[]{"LOOPSTART l1", "MAP 0 1", "OUTPUT 1", "SHIFT 0 1","LOOPEND l1 EOS 0", "MAP #@ 1", "LOOPSTART l2", "OUTPUT 1", "SHIFT 1 1", "LOOPEND l2 EOS 1", "END"};
-        pwd[3] = new PasswordData(map3, instr3, "Have a map from letters to digits, consonants are 2 and vowels are 1, and output the value of each letter.", 6);
+        String[] instr3 = new String[]{"LOOPSTART l1", "MAP 0 1", "OUTPUT 1", "SHIFT 0 1","LOOPEND L1 EOS 0", "MAP #@ 1", "LOOPSTART L2", "OUTPUT 1", "SHIFT 1 1", "LOOPEND L2 EOS 1", "END"};
+        pwd[3] = new PasswordData(map3, instr3, "Password = Map vowels to 1, consonants to 2.", 3);
 
         //Case 5: Running Sum Schema
         HashMap<String, String> map4 = new HashMap<String, String>();
@@ -176,10 +176,10 @@ public class introduction extends AppCompatActivity {
             map4.put(vowels[x], "1");
         }
         map4.put("@", "aB7@");
-        String[] instr4 = new String[]{"SET 2 #0", "LOOPSTART l1", "MAP 0 1", "PARSE 1", "SHIFT 0 1",
-                "SET 2 2 + 1 m10", "OUTPUT 2", "LOOPEND l1 EOS 0",
-                "MAP #@ 1", "LOOPSTART l2", "OUTPUT 1", "SHIFT 1 1", "LOOPEND l2 EOS 1", "END"};
-        pwd[4] = new PasswordData(map4, instr4, "Using the map from letters to digits (once again consonants are 2 and vowels are 1), maintain a running sum and output it mod 10.", 6);
+        String[] instr4 = new String[]{"SET 2 #0", "LOOPSTART L1", "MAP 0 1", "PARSE 1", "SHIFT 0 1",
+                "SET 2 2 + 1 m10", "OUTPUT 2", "LOOPEND L1 EOS 0",
+                "MAP #@ 1", "LOOPSTART L2", "OUTPUT 1", "SHIFT 1 1", "LOOPEND L2 EOS 1", "END"};
+        pwd[4] = new PasswordData(map4, instr4, "Password = Map vowels to 1, consonants to 2, output a running sum mod 10.", 3);
 
         //Case 6: Vowels only
         HashMap<String,String> map5 = new HashMap<String,String>();
@@ -189,9 +189,9 @@ public class introduction extends AppCompatActivity {
         map5.put("O", "4");
         map5.put("U", "5");
         map5.put("@", "aB7@");
-        String[] instr5 = new String[]{"LOOPSTART l1", "IF !CONTAINS 0 START", "MAP 0 1", "OUTPUT 1", "LABEL START", "SHIFT 0 1", "LOOPEND l1 EOS 0",
-                "MAP #@ 1", "LOOPSTART l2", "OUTPUT 1", "SHIFT 1 1", "LOOPEND l2 EOS 1", "END"};
-        pwd[5] = new PasswordData(map5, instr5, "Map only vowels to digits and output only when the letter is a vowel.", 6);
+        String[] instr5 = new String[]{"LOOPSTART L1", "IF !CONTAINS 0 START", "MAP 0 1", "OUTPUT 1", "LABEL START", "SHIFT 0 1", "LOOPEND L1 EOS 0",
+                "MAP #@ 1", "LOOPSTART L2", "OUTPUT 1", "SHIFT 1 1", "LOOPEND L2 EOS 1", "END"};
+        pwd[5] = new PasswordData(map5, instr5, "Map vowels to digits, A -> 1, E -> 2, ....", 4);
 
         //Case 7: Vowels only, running sum
         HashMap<String,String> map6 = new HashMap<String,String>();
@@ -201,10 +201,10 @@ public class introduction extends AppCompatActivity {
         map6.put("O", "4");
         map6.put("U", "5");
         map6.put("@", "aB7@");
-        String[] instr6 = new String[]{"SET 2 #0", "LOOPSTART l1", "IF !CONTAINS 0 GO", "MAP 0 1", "PARSE 1", "SET 2 2 + 1 m10", "OUTPUT 2",
-                "LABEL GO", "SHIFT 0 1", "LOOPEND l1 EOS 0",
-                "MAP #@ 1", "LOOPSTART l2", "OUTPUT 1", "SHIFT 1 1", "LOOPEND l2 EOS 1", "END"};
-        pwd[6] = new PasswordData(map6, instr6, "Map vowels to digits and maintain a running sum of the values mod 10 and output only on vowels.", 6);
+        String[] instr6 = new String[]{"SET 2 #0", "LOOPSTART L1", "IF !CONTAINS 0 GO", "MAP 0 1", "PARSE 1", "SET 2 2 + 1 m10", "OUTPUT 2",
+                "LABEL GO", "SHIFT 0 1", "LOOPEND L1 EOS 0",
+                "MAP #@ 1", "LOOPSTART L2", "OUTPUT 1", "SHIFT 1 1", "LOOPEND L2 EOS 1", "END"};
+        pwd[6] = new PasswordData(map6, instr6, "Map vowels to digits, output a running sum mod 10.", 6);
 
         //Case 8: Vowels only, running sum, start from last
         HashMap<String,String> map7 = new HashMap<String,String>();
@@ -214,10 +214,10 @@ public class introduction extends AppCompatActivity {
         map7.put("O", "4");
         map7.put("U", "5");
         map7.put("@", "aB7@");
-        String[] instr7 = new String[]{"LOOPSTART l1", "SHIFT 0 1", "LOOPEND l1 EOS 0", "SHIFT 0 -1", "SET 3 &0",
-                "SET 2 #0", "LOOPSTART l2", "IF !CONTAINS 0 GO", "MAP 0 1", "PARSE 1", "SET 2 2 + 1 m10", "OUTPUT 2", "LABEL GO", "SHIFT 0 1 mod", "LOOPEND l2 EQ &0 3",
-                "MAP #@ 1", "LOOPSTART l3", "OUTPUT 1", "SHIFT 1 1", "LOOPEND l3 EOS 1", "END"};
-        pwd[7] = new PasswordData(map7, instr7, "Starting from the last character, map vowels to digits and maintain a running sum of values mod 10, outputting only on vowels.", 6, 4);
+        String[] instr7 = new String[]{"LOOPSTART L1", "SHIFT 0 1", "LOOPEND L1 EOS 0", "SHIFT 0 -1", "SET 3 &0",
+                "SET 2 #0", "LOOPSTART L2", "IF !CONTAINS 0 GO", "MAP 0 1", "PARSE 1", "SET 2 2 + 1 m10", "OUTPUT 2", "LABEL GO", "SHIFT 0 1 mod", "LOOPEND L2 EQ &0 3",
+                "MAP #@ 1", "LOOPSTART L3", "OUTPUT 1", "SHIFT 1 1", "LOOPEND L3 EOS 1", "END"};
+        pwd[7] = new PasswordData(map7, instr7, "Map vowels to digits, starting at last vowel, output a running sum mod 10.", 6, 4);
 
         //Case 9: All letters digit map
         HashMap<String,String> map8 = new HashMap<String,String>();
@@ -225,9 +225,9 @@ public class introduction extends AppCompatActivity {
             map8.put((char)('A'+x)+"", (int)(Math.random()*10)+"");
         }
         map8.put("@", "aB7@");
-        String[] instr8 = new String[]{"LOOPSTART l1", "IF !CONTAINS 0 START", "MAP 0 1", "OUTPUT 1", "LABEL START", "SHIFT 0 1", "LOOPEND l1 EOS 0",
-                "MAP #@ 1", "LOOPSTART l2", "OUTPUT 1", "SHIFT 1 1", "LOOPEND l2 EOS 1", "END"};
-        pwd[8] = new PasswordData(map8, instr8, "Map letters to digits and output.", 6);
+        String[] instr8 = new String[]{"LOOPSTART L1", "IF !CONTAINS 0 START", "MAP 0 1", "OUTPUT 1", "LABEL START", "SHIFT 0 1", "LOOPEND L1 EOS 0",
+                "MAP #@ 1", "LOOPSTART L2", "OUTPUT 1", "SHIFT 1 1", "LOOPEND L2 EOS 1", "END"};
+        pwd[8] = new PasswordData(map8, instr8, "Map letters to digits.", 6);
 
         //Case 10: All letters digit starting from back
         HashMap<String,String> map9 = new HashMap<String,String>();
@@ -235,10 +235,10 @@ public class introduction extends AppCompatActivity {
             map9.put((char)('A'+x)+"", (int)(Math.random()*10)+"");
         }
         map9.put("@", "aB7@");
-        String[] instr9 = new String[]{"LOOPSTART l3", "SHIFT 0 1", "LOOPEND l3 EOS 0", "SHIFT 0 -1", "SET 2 &0",
-                "LOOPSTART l1", "MAP 0 1", "OUTPUT 1", "SHIFT 0 1 mod", "LOOPEND l1 EQ &0 2",
-                "MAP #@ 1", "LOOPSTART l2", "OUTPUT 1", "SHIFT 1 1", "LOOPEND l2 EOS 1", "END"};
-        pwd[9] = new PasswordData(map9, instr9, "Map letters to digit and output but start from last character.", 6);
+        String[] instr9 = new String[]{"LOOPSTART L3", "SHIFT 0 1", "LOOPEND L3 EOS 0", "SHIFT 0 -1", "SET 2 &0",
+                "LOOPSTART L1", "MAP 0 1", "OUTPUT 1", "SHIFT 0 1 mod", "LOOPEND L1 EQ &0 2",
+                "MAP #@ 1", "LOOPSTART L2", "OUTPUT 1", "SHIFT 1 1", "LOOPEND L2 EOS 1", "END"};
+        pwd[9] = new PasswordData(map9, instr9, "Map letters to digit, starting from the last letter.", 6);
 
         //Case 11: Vowels only, running sum, start from last
         HashMap<String,String> map10 = new HashMap<String,String>();
@@ -246,10 +246,10 @@ public class introduction extends AppCompatActivity {
             map10.put((char)('A'+x)+"", (int)(Math.random()*10)+"");
         }
         map10.put("@", "aB7@");
-        String[] instr10 = new String[]{"LOOPSTART l1", "SHIFT 0 1", "LOOPEND l1 EOS 0", "SHIFT 0 -1", "SET 3 &0",
-                "SET 2 #0", "LOOPSTART l2", "IF !CONTAINS 0 GO", "MAP 0 1", "PARSE 1", "SET 2 2 + 1 m10", "OUTPUT 2", "LABEL GO", "SHIFT 0 1 mod", "LOOPEND l2 EQ &0 3",
-                "MAP #@ 1", "LOOPSTART l3", "OUTPUT 1", "SHIFT 1 1", "LOOPEND l3 EOS 1", "END"};
-        pwd[10] = new PasswordData(map10, instr10, "Starting from the last character, map characters to digits and maintain a running sum of values mod 10.", 6, 4);
+        String[] instr10 = new String[]{"LOOPSTART L1", "SHIFT 0 1", "LOOPEND L1 EOS 0", "SHIFT 0 -1", "SET 3 &0",
+                "SET 2 #0", "LOOPSTART L2", "IF !CONTAINS 0 GO", "MAP 0 1", "PARSE 1", "SET 2 2 + 1 m10", "OUTPUT 2", "LABEL GO", "SHIFT 0 1 mod", "LOOPEND L2 EQ &0 3",
+                "MAP #@ 1", "LOOPSTART L3", "OUTPUT 1", "SHIFT 1 1", "LOOPEND L3 EOS 1", "END"};
+        pwd[10] = new PasswordData(map10, instr10, "Map letters to digits, starting at last letter, output a running sum mod 10.", 7, 4);
 
         /**
         //Case 1: Fixed Password

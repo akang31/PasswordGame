@@ -2,6 +2,7 @@ package pwgame.passwordgame;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -43,12 +44,22 @@ public class postLevelActivity extends AppCompatActivity {
         ll.setOrientation(LinearLayout.VERTICAL);
 
         TextView top = new TextView(this);
-        top.setText("Level " + (levelNum + 1) + ",   Score:" + score + "   Q:" + pwd.getQ());
+        top.setText("Level " + (levelNum + 1) + ",   Score:" + score + "   Par Score:" + pwd.getQ());
+        top.setTextSize(18);
+        top.setTextColor(Color.BLUE);
         top.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.1f));
         ll.addView(top);
 
+        TextView congrats = new TextView(this);
+        congrats.setText("Well Done!!");
+        congrats.setTextColor(Color.RED);
+        congrats.setTextSize(20);
+        congrats.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.1f));
+        ll.addView(congrats);
+
         TextView desc = new TextView(this);
         desc.setText(pwd.getDescription());
+        desc.setTextSize(18);
         desc.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.2f));
         ll.addView(desc);
 
