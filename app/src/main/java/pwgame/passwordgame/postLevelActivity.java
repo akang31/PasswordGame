@@ -168,7 +168,7 @@ public class postLevelActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_post_level, menu);
+        getMenuInflater().inflate(R.menu.menu_level, menu);
         return true;
     }
 
@@ -179,6 +179,10 @@ public class postLevelActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        Intent intent = new Intent(this, introduction.class);
+        intent.putParcelableArrayListExtra("pwd",getIntent().<PasswordData>getParcelableArrayListExtra("pwd"));
+        startActivity(intent);
+        finish();
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
