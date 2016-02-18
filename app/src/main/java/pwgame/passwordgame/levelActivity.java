@@ -103,7 +103,9 @@ public class levelActivity extends AppCompatActivity {
         uh.setOrientation(LinearLayout.VERTICAL);
         score = new TextView(this);
         score.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.4f));
-        score.setText("Score: 0       Q: " + pwd.getQ());
+        score.setText("Score: 0       Par score: " + pwd.getQ());
+        score.setTextSize(20);
+        score.setTextColor(Color.BLUE);
         score.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         uh.addView(score);
         challenge = new TextView(this);

@@ -38,8 +38,8 @@ public class introduction extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String[] desc = new String[]{"Welcome to the Password Game!"," ", "The purpose of this game is to guess passwords for various websites using as few guesses as possible.",
-                "Each level uses a different rule (schema) for the true passwords. Make your best guess for each website that you are shown!",
+        String[] desc = new String[]{"Welcome to the Password Game!"," ", "The object of this game is to guess passwords using as few guesses as possible.",
+                "Each level uses a different rule (schema) for the true passwords. Respond to each challenge (website name) with your best guess!"," ",
                 "After trying these levels, we encourage you to create your own password schema."};
         LinearLayout ll = new LinearLayout(this);
         ll.setOrientation(LinearLayout.VERTICAL);
