@@ -39,6 +39,9 @@ public class postLevelActivity extends AppCompatActivity {
             editor.putInt("level"+levelNum, score);
             editor.commit();
         }
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putInt("lastLevel", levelNum);
+        editor.commit();
         LinearLayout ll = new LinearLayout(this);
         ll.setWeightSum(1.0f);
         ll.setOrientation(LinearLayout.VERTICAL);

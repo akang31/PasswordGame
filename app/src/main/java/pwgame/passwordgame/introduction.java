@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -65,8 +66,14 @@ public class introduction extends AppCompatActivity {
                         send.add(arr[x]);
                     }
                 }
+                SharedPreferences sp = getSharedPreferences("scores", 0);
+                int put = 0;
+                if (sp.contains("lastLevel")) {
+                    put = Math.min(arr.length-1, sp.getInt("lastLevel", 1000000)+1);
+                    Log.e("LEVEL!!!!", put+"");
+                }
                 intent.putParcelableArrayListExtra("pwd", send);
-                intent.putExtra("levelNumber", 0);
+                intent.putExtra("levelNum", put);
                 startActivity(intent);
                 //finish();
             }
