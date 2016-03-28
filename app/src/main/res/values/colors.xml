@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="button" type="color">#AAAAAA</item>
+    <item name="text" type="color">#A12345</item>
+    <item name="textbg" type="color">#ABCDDC</item>
 </resources>

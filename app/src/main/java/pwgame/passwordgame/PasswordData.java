@@ -17,6 +17,8 @@ public class PasswordData implements Parcelable
 {
     private String description;
     private int SIZE_OF_MEMORY = 3;
+    private String[] hints;
+    private int hintIndex = 0;
     private ArrayList<String> trace;
     private ArrayList<ArrayList<String>> memHist;
     private ArrayList<ArrayList<Integer>> indHist;
@@ -52,6 +54,11 @@ public class PasswordData implements Parcelable
         description = source.readString();
         Q = source.readInt();
         SIZE_OF_MEMORY = source.readInt();
+        int lenOfHints = source.readInt();
+        if (lenOfHints != 0) {
+            hints = new String[lenOfHints];
+            source.readStringArray(hints);
+        }
     }
     public PasswordData(HashMap<String, String> preProcess, String[] instructions) {
         this.preProcess = preProcess;
@@ -81,6 +88,17 @@ public class PasswordData implements Parcelable
         this.SIZE_OF_MEMORY = k;
         Log.e("SIZE CHANGED!", SIZE_OF_MEMORY+"");
     }
+    public String getHint() {
+        if (hints == null || hints.length == 0) {
+            return "No hints";
+        } else {
+            hintIndex %= hints.length;
+            return hints[hintIndex++];
+        }
+    }
+    public void setHints(String[] hts) {
+        this.hints=hts;
+    }
     public String getDescription() {
         return description;
     }
@@ -106,6 +124,9 @@ public class PasswordData implements Parcelable
     }
     public PasswordTrace getFullTrace() {
         return new PasswordTrace(chlg, trace, memHist, indHist, out);
+    }
+    public String[] getInstructions() {
+        return instructions;
     }
     private String chlg= "";
     public String getPassword(String challenge, boolean includeTrace) {
@@ -661,5 +682,11 @@ public class PasswordData implements Parcelable
         dest.writeString(description);
         dest.writeInt(Q);
         dest.writeInt(SIZE_OF_MEMORY);
+        if (hints != null) {
+            dest.writeInt(hints.length);
+            dest.writeStringArray(hints);
+        } else {
+            dest.writeInt(0);
+        }
     }
 }

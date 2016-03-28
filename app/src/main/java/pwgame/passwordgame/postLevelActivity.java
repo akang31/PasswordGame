@@ -3,9 +3,11 @@ package pwgame.passwordgame;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -63,7 +65,7 @@ public class postLevelActivity extends AppCompatActivity {
         TextView desc = new TextView(this);
         desc.setText(pwd.getDescription());
         desc.setTextSize(18);
-        desc.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.2f));
+        desc.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.1f));
         ll.addView(desc);
 
         LinearLayout outerLin = new LinearLayout(this);
@@ -71,17 +73,26 @@ public class postLevelActivity extends AppCompatActivity {
         LinearLayout addz = new LinearLayout(this);
         addz.setWeightSum(3.0f);
 
-        Button add11 = new Button(this);
+        TextView add11 = (TextView) getLayoutInflater().inflate(R.layout.text_view_layout, null);
         add11.setText("Challenge");
+        add11.setTextSize(20);
+        add11.setGravity(Gravity.CENTER);
+        add11.setTypeface(null, Typeface.BOLD);
         add11.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
         addz.addView(add11);
 
-        Button add12 = new Button(this);
+        TextView add12 = (TextView) getLayoutInflater().inflate(R.layout.text_view_layout, null);
         add12.setText("Guess");
         add12.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
+        add12.setTextSize(20);
+        add12.setGravity(Gravity.CENTER);
+        add12.setTypeface(null, Typeface.BOLD);
         addz.addView(add12);
 
-        Button add13 = new Button(this);
+        TextView add13 = (TextView) getLayoutInflater().inflate(R.layout.text_view_layout, null);
+        add13.setTextSize(20);
+        add13.setGravity(Gravity.CENTER);
+        add13.setTypeface(null, Typeface.BOLD);
         add13.setText("Response");
         add13.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
         addz.addView(add13);
@@ -97,20 +108,23 @@ public class postLevelActivity extends AppCompatActivity {
             LinearLayout add = new LinearLayout(this);
             add.setWeightSum(3.0f);
 
-            Button add1 = new Button(this);
+            TextView add1 = (TextView) getLayoutInflater().inflate(R.layout.text_view_layout, null);
             add1.setText(challenges.get(x));
             add1.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
             add1.setTransformationMethod(null);
+            add1.setGravity(Gravity.CENTER);
             add.addView(add1);
 
-            Button add2 = new Button(this);
+            TextView add2 = (TextView) getLayoutInflater().inflate(R.layout.text_view_layout, null);
             add2.setText(guesses.get(x));
+            add2.setGravity(Gravity.CENTER);
             add2.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
             add2.setTransformationMethod(null);
             add.addView(add2);
 
-            Button add3 = new Button(this);
+            TextView add3 = (TextView) getLayoutInflater().inflate(R.layout.text_view_layout, null);
             add3.setText(answers.get(x));
+            add3.setGravity(Gravity.CENTER);
             add3.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
             add3.setTransformationMethod(null);
             add.addView(add3);
@@ -129,7 +143,7 @@ public class postLevelActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 ArrayList<PasswordData> arr = getIntent().<PasswordData>getParcelableArrayListExtra("pwd");
-                int levelNum = getIntent().getExtras().getInt("levelNumber")+1;
+                int levelNum = getIntent().getExtras().getInt("levelNumber") + 1;
                 Log.e("Check", levelNum + " " + arr.size());
                 if (levelNum >= arr.size()) {
                     Intent intent = new Intent(v.getContext(), endGame.class);
@@ -146,16 +160,19 @@ public class postLevelActivity extends AppCompatActivity {
         });
         ll.addView(nextLevel);
 
+        LinearLayout buttonHold = new LinearLayout(this);
+        buttonHold.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.1f));
+        buttonHold.setWeightSum(2.0f);
         Button feedback = new Button(this);
         feedback.setText("Send Feedback");
-        feedback.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.1f));
+        feedback.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
         feedback.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("message/rfc822");
                 intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"akang31@gatech.edu", "vempala@cc.gatech.edu"});
-                intent.putExtra(Intent.EXTRA_SUBJECT, "Password Game: Level " + (getIntent().getExtras().getInt("levelNumber")+1) + " feedback");
+                intent.putExtra(Intent.EXTRA_SUBJECT, "Password Game: Level " + (getIntent().getExtras().getInt("levelNumber") + 1) + " feedback");
                 try {
                     startActivity(Intent.createChooser(intent, "Send feedback"));
                 } catch (Exception e) {
@@ -163,7 +180,23 @@ public class postLevelActivity extends AppCompatActivity {
                 }
             }
         });
-        ll.addView(feedback);
+        Button source = new Button(this);
+        source.setText("See Source");
+        source.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
+        source.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), source.class);
+                int levelNum = getIntent().getExtras().getInt("levelNumber");
+                PasswordData pwd = getIntent().<PasswordData>getParcelableArrayListExtra("pwd").get(levelNum);
+                intent.putExtra("pwd", pwd);
+                startActivity(intent);
+            }
+        });
+        buttonHold.addView(feedback);
+        buttonHold.addView(source);
+
+        ll.addView(buttonHold);
 
         setContentView(ll);
     }

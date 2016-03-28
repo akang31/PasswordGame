@@ -11,4 +11,5 @@
     <string name="title_activity_trace_display">traceDisplayActivity</string>
     <string name="title_activity_introduction">introduction</string>
     <string name="title_activity_end_game">endGame</string>
+    <string name="title_activity_source">source</string>
 </resources>

@@ -4,5 +4,9 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
     </style>
+    <style name="TextViewMod">
+        <item name="android:textColor">@color/text</item>
+        <item name="android:background">@drawable/back</item>
+    </style>
 
 </resources>

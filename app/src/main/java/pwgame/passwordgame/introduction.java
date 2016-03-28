@@ -87,6 +87,7 @@ public class introduction extends AppCompatActivity {
         for (int x = 0; x < header.length; x++) {
             TextView a1 = new TextView(this);
             a1.setText(header[x]);
+          //  a1.setTextColor(Color.BLACK);
             a1.setTransformationMethod(null);
             a1.setTypeface(null, Typeface.BOLD);
             a1.setGravity(Gravity.CENTER);
@@ -125,8 +126,31 @@ public class introduction extends AppCompatActivity {
             ll.addView(add);
         }
         ScrollView sv = new ScrollView(this);
+        Button reset = new Button(this);
+        reset.setText("Reset Local High Scores");
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences sp = getSharedPreferences("scores", 0);
+                SharedPreferences.Editor ed = sp.edit();
+                for (int x = 0; x < levelCount; x++) {
+                    if (sp.contains("level" + x)) {
+                        ed.remove("level" + x);
+                    }
+                }
+                if (sp.contains("lastLevel")) {
+                    ed.remove("lastLevel");
+                }
+                ed.commit();
+                Intent intent = new Intent(v.getContext(), introduction.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+        ll.addView(reset);
         sv.addView(ll);
         setContentView(sv);
+        //setContentView(R.layout.activity_introduction);
     }
 
     private void createLevels(PasswordData[] pwd) {
@@ -211,7 +235,9 @@ public class introduction extends AppCompatActivity {
         String[] instr6 = new String[]{"SET 2 #0", "LOOPSTART L1", "IF !CONTAINS 0 GO", "MAP 0 1", "PARSE 1", "SET 2 2 + 1 m10", "OUTPUT 2",
                 "LABEL GO", "SHIFT 0 1", "LOOPEND L1 EOS 0",
                 "MAP #@ 1", "LOOPSTART L2", "OUTPUT 1", "SHIFT 1 1", "LOOPEND L2 EOS 1", "END"};
-        pwd[6] = new PasswordData(map6, instr6, "Map vowels to digits, output a running sum mod 10.", 6);
+        PasswordData a6 = new PasswordData(map6, instr6, "Map vowels to digits, output a running sum mod 10.", 6);
+        a6.setHints(new String[]{"Vowels", "Running Sum"});
+        pwd[6] = a6;
 
         //Case 8: Vowels only, running sum, start from last
         HashMap<String,String> map7 = new HashMap<String,String>();
