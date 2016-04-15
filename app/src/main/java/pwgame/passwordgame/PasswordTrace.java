@@ -32,6 +32,9 @@ public class PasswordTrace implements Parcelable {
         this.indHist=indHist;
         this.output=output;
     }
+    public int getMin() {
+        return Math.min(Math.min(trace.size(), memHist.size()), Math.min(indHist.size(), output.size()));
+    }
     public PasswordTrace(Parcel source) {
         challenge = source.readString();
         int size = source.readInt();
@@ -105,31 +108,38 @@ public class PasswordTrace implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(challenge);
         dest.writeInt(trace.size());
-        String[] arr = new String[trace.size()];
-        arr = trace.toArray(arr);
-        dest.writeStringArray(arr);
-
-        dest.writeInt(memHist.size());
-        dest.writeInt(memHist.get(0).size());
-        for (ArrayList<String> s : memHist) {
-            arr = new String[s.size()];
-            arr = s.toArray(arr);
+        if (trace.size() > 0) {
+            String[] arr = new String[trace.size()];
+            arr = trace.toArray(arr);
             dest.writeStringArray(arr);
+        }
+        dest.writeInt(memHist.size());
+        if (memHist.size() > 0) {
+            dest.writeInt(memHist.get(0).size());
+            for (ArrayList<String> s : memHist) {
+                String[] arr = new String[s.size()];
+                arr = s.toArray(arr);
+                dest.writeStringArray(arr);
+            }
         }
 
         dest.writeInt(indHist.size());
-        dest.writeInt(indHist.get(0).size());
-        for (ArrayList<Integer> s : indHist) {
-            int[] arr1 = new int[s.size()];
-            for (int x = 0;x  < s.size(); x++) {
-                arr1[x] = s.get(x);
+        if (indHist.size() > 0) {
+            dest.writeInt(indHist.get(0).size());
+            for (ArrayList<Integer> s : indHist) {
+                int[] arr1 = new int[s.size()];
+                for (int x = 0; x < s.size(); x++) {
+                    arr1[x] = s.get(x);
+                }
+                dest.writeIntArray(arr1);
             }
-            dest.writeIntArray(arr1);
         }
 
         dest.writeInt(output.size());
-        arr = new String[output.size()];
-        arr = output.toArray(arr);
-        dest.writeStringArray(arr);
+        if (output.size() > 0) {
+            String[] arr = new String[output.size()];
+            arr = output.toArray(arr);
+            dest.writeStringArray(arr);
+        }
     }
 }

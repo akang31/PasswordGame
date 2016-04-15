@@ -126,6 +126,16 @@ public class introduction extends AppCompatActivity {
             ll.addView(add);
         }
         ScrollView sv = new ScrollView(this);
+        Button build = new Button(this);
+        build.setText("Schema Builder");
+        build.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), schemaBuilder.class);
+                startActivity(intent);
+            }
+        });
+        ll.addView(build);
         Button reset = new Button(this);
         reset.setText("Reset Local High Scores");
         reset.setOnClickListener(new View.OnClickListener() {

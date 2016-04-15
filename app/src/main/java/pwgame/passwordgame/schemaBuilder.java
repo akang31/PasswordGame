@@ -1,5 +1,6 @@
 package pwgame.passwordgame;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -23,10 +24,6 @@ public class schemaBuilder extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        map = new HashMap<String, String>();
-        rules = new ArrayList<String>();
-        rules.add("MAP cc 0");
-        rules.add("OUTPUT 0");
         mainMenuCreate();
         //setContentView(R.layout.activity_schema_builder);
     }
@@ -60,30 +57,21 @@ public class schemaBuilder extends AppCompatActivity {
     }
 
     private void mapMenuCreate() {
-        LinearLayout ll = new LinearLayout(this);
-        Spinner from = new Spinner(this);
-        String[] fromEntries = new String[]{"A-Z", "0-9"};
-        ArrayAdapter spinAdapt1 = new ArrayAdapter(this, android.R.layout.simple_spinner_item, fromEntries);
-        from.setAdapter(spinAdapt1);
-        Spinner to = new Spinner(this);
-        String[] toEntries = new String[]{"A-Z", "0-9"};
-        ArrayAdapter spinAdapt2 = new ArrayAdapter(this, android.R.layout.simple_spinner_item, toEntries);
-        to.setAdapter(spinAdapt2);
-        ll.addView(from);
-        ll.addView(to);
-        Button but = new Button(this);
-        but.setText("Save");
-        but.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mainMenuCreate();
-            }
-        });
-        ll.addView(but);
-        setContentView(ll);
+        Intent intent = new Intent(this, schemaBuilderMap.class);
+        //include map
+        startActivity(intent);
+        finish();
     }
 
     private void schemaMenuCreate() {
+        Intent intent = new Intent(this,schemaBuilderInstructions.class);
+        if (getIntent().getExtras() != null && getIntent().getExtras().containsKey("start")) {
+            intent.putIntegerArrayListExtra("start",getIntent().getIntegerArrayListExtra("start"));
+            intent.putIntegerArrayListExtra("end",getIntent().getIntegerArrayListExtra("end"));
+        }
+        startActivity(intent);
+        finish();
+/**
         LinearLayout overall = new LinearLayout(this);
         overall.setOrientation(LinearLayout.VERTICAL);
         TextView tv = new TextView(this);
@@ -114,6 +102,7 @@ public class schemaBuilder extends AppCompatActivity {
         rules.remove(rules.size()-1);
         overall.addView(ll);
         setContentView(overall);
+ **/
     }
 
     @Override

@@ -129,6 +129,10 @@ public class PasswordData implements Parcelable
         return instructions;
     }
     private String chlg= "";
+    private int failLine = -1;
+    public int getFailLine() {
+        return failLine;
+    }
     public String getPassword(String challenge, boolean includeTrace) {
         String password = "";
         chlg = challenge;
@@ -144,32 +148,53 @@ public class PasswordData implements Parcelable
         indHist = new ArrayList<ArrayList<Integer>>();
         out = new ArrayList<String>();
         String curOut = "";
+        if (instructions.length == 0) {
+            failLine = 0;
+            return "";
+        }
         while (!done(index)) {
             Log.e("RUNNING", index+"");
-            Result res = run(index, indices, mem);
-            if (true) {
-                //Hack: index < res.getIndex(). Assumes forward action implies taking an if statement. Very easy to make counterexample, but should work for now
-                String tr = tracify(instructions[index], mem, indices, index < res.getIndex());
-                if (!tr.equals("")) {
-                    trace.add(tr);
-                    memHist.add(new ArrayList<String>(Arrays.asList(Arrays.copyOf(mem, mem.length))));
-                    Integer[] copy = new Integer[indices.length];
-                    for (int x = 0; x < indices.length; x++) {
-                        copy[x] = indices[x];
-                    }
-                    indHist.add(new ArrayList<Integer>(Arrays.asList(copy)));
-                    if (tr.substring(0, 6).equalsIgnoreCase("output")) {
-                        int ind = Integer.parseInt(instructions[index].substring(instructions[index].indexOf(" ")+1));
-                        if (indices[ind] >= 0) {
-                            curOut += mem[ind].charAt(indices[ind]);
-                        } else {
-                            curOut += Integer.parseInt(mem[ind]);
+            Result res = new Result(0,"");
+            try {
+                res = run(index, indices, mem);
+            } catch(Exception e) {
+                Log.e("SDFSDF","Failure during command run");
+                failLine = index;
+                return "";
+            }
+            try {
+                if (true) {
+                    //Hack: index < res.getIndex(). Assumes forward action implies taking an if statement. Very easy to make counterexample, but should work for now
+                    String tr = tracify(instructions[index], mem, indices, index < res.getIndex());
+                    if (!tr.equals("")) {
+                        trace.add(tr);
+                        memHist.add(new ArrayList<String>(Arrays.asList(Arrays.copyOf(mem, mem.length))));
+                        Integer[] copy = new Integer[indices.length];
+                        for (int x = 0; x < indices.length; x++) {
+                            copy[x] = indices[x];
                         }
+                        indHist.add(new ArrayList<Integer>(Arrays.asList(copy)));
+                        if (tr.substring(0, 6).equalsIgnoreCase("output")) {
+                            int ind = Integer.parseInt(instructions[index].substring(instructions[index].indexOf(" ")+1));
+                            if (indices[ind] >= 0) {
+                                curOut += mem[ind].charAt(indices[ind]);
+                            } else {
+                                curOut += Integer.parseInt(mem[ind]);
+                            }
+                        }
+                        out.add(curOut);
                     }
-                    out.add(curOut);
                 }
+            } catch(Exception e) {
+                Log.e("SDFSDF", "Failure during trace creation");
+                failLine = index;
+                return "";
             }
             index = res.getIndex();
+            if (index >= instructions.length) {
+                failLine = index;
+                return "";
+            }
             password += res.getOutput();
             count++;
         }
@@ -374,7 +399,7 @@ public class PasswordData implements Parcelable
      * @return
      */
     private boolean done(int index) {
-        return instructions[index].equals("END");
+        return instructions[index].trim().equals("END");
     }
     private int findLabel(String label, String keyword) {
         for (int x = 0; x < instructions.length; x++) {
@@ -413,7 +438,7 @@ public class PasswordData implements Parcelable
         }
         return rett^flip;
     }
-    private Result run(int ind, int[] indices, String[] mem) {
+    private Result run(int ind, int[] indices, String[] mem) throws Exception {
         /*
             Variable = 0,1,... indices in string array
 
@@ -549,9 +574,10 @@ public class PasswordData implements Parcelable
                     Log.e("LOG", pr[0]+"");
                 }
                 break;
+           // case "END":
+            //    break;
             default:
-                Log.e("No Switch", "eval");
-                break;
+                throw new RuntimeException();
         }
         return ret;
     }

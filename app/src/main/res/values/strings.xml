@@ -12,4 +12,6 @@
     <string name="title_activity_introduction">introduction</string>
     <string name="title_activity_end_game">endGame</string>
     <string name="title_activity_source">source</string>
+    <string name="title_activity_schema_builder_map">schemaBuilderMap</string>
+    <string name="title_activity_schema_builder_instructions">schemaBuilderInstructions</string>
 </resources>

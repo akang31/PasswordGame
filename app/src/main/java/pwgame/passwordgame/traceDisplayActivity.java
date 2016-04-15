@@ -128,7 +128,7 @@ public class traceDisplayActivity extends AppCompatActivity {
 
 
 
-        for (int x = 0; x < trace.getTrace().size(); x++) {
+        for (int x = 0; x < trace.getOutputTrace().size(); x++) {
             temp = new LinearLayout(this);
             temp.setWeightSum(2.0f);
             Button add = new Button(this);

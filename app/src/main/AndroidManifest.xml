@@ -54,6 +54,14 @@
             android:name=".source"
             android:label="@string/title_activity_source" >
         </activity>
+        <activity
+            android:name=".schemaBuilderMap"
+            android:label="@string/title_activity_schema_builder_map" >
+        </activity>
+        <activity
+            android:name=".schemaBuilderInstructions"
+            android:label="@string/title_activity_schema_builder_instructions" >
+        </activity>
     </application>
 
 </manifest>
