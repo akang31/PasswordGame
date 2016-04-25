@@ -24,8 +24,15 @@ public class postLevelActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        int levelNum = getIntent().getExtras().getInt("levelNumber");
-        PasswordData pwd = getIntent().<PasswordData>getParcelableArrayListExtra("pwd").get(levelNum);
+        PasswordData pwd = new PasswordData();
+        int levelNum = 0;
+        if (getIntent().getExtras().containsKey("pwd")) {
+            levelNum = getIntent().getExtras().getInt("levelNumber");
+            pwd = getIntent().<PasswordData>getParcelableArrayListExtra("pwd").get(levelNum);
+        } else {
+            levelNum = getIntent().getExtras().getInt("level");
+            pwd = getIntent().getParcelableExtra("PasswordData");
+        }
         ArrayList<String> challenges = getIntent().getStringArrayListExtra("challenges");
         int score = challenges.size();
         SharedPreferences sp = getSharedPreferences("scores", 0);
@@ -142,18 +149,22 @@ public class postLevelActivity extends AppCompatActivity {
         nextLevel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<PasswordData> arr = getIntent().<PasswordData>getParcelableArrayListExtra("pwd");
-                int levelNum = getIntent().getExtras().getInt("levelNumber") + 1;
-                Log.e("Check", levelNum + " " + arr.size());
-                if (levelNum >= arr.size()) {
-                    Intent intent = new Intent(v.getContext(), endGame.class);
-                    startActivity(intent);
-                    finish();
+                if (getIntent().getExtras().containsKey("pwd")) {
+                    ArrayList<PasswordData> arr = getIntent().<PasswordData>getParcelableArrayListExtra("pwd");
+                    int levelNum = getIntent().getExtras().getInt("levelNumber") + 1;
+                    Log.e("Check", levelNum + " " + arr.size());
+                    if (levelNum >= arr.size()) {
+                        Intent intent = new Intent(v.getContext(), endGame.class);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Intent intent = new Intent(v.getContext(), levelActivity.class);
+                        intent.putParcelableArrayListExtra("pwd", arr);
+                        intent.putExtra("levelNum", getIntent().getExtras().getInt("levelNumber") + 1);
+                        startActivity(intent);
+                        finish();
+                    }
                 } else {
-                    Intent intent = new Intent(v.getContext(), levelActivity.class);
-                    intent.putParcelableArrayListExtra("pwd", arr);
-                    intent.putExtra("levelNum", getIntent().getExtras().getInt("levelNumber") + 1);
-                    startActivity(intent);
                     finish();
                 }
             }

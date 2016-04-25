@@ -136,6 +136,16 @@ public class introduction extends AppCompatActivity {
             }
         });
         ll.addView(build);
+        Button search = new Button(this);
+        search.setText("Search for Schemas");
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), search.class);
+                startActivity(intent);
+            }
+        });
+        ll.addView(search);
         Button reset = new Button(this);
         reset.setText("Reset Local High Scores");
         reset.setOnClickListener(new View.OnClickListener() {

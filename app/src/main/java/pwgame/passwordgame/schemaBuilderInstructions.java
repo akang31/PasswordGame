@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class schemaBuilderInstructions extends AppCompatActivity {
@@ -30,32 +31,13 @@ public class schemaBuilderInstructions extends AppCompatActivity {
     int[][] mapMaker;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // ArrayList<ArrayList<Integer>>
-        // ["MAP", "SET", "GOTO", "LABEL", "IF", "SHIFT", "PARSE", "END", "OUTPUT"]
-        /**
-         * [index, indexOfVariable*, String, statement(IF), index or #string]
-         * MAP = [
-         *
-         */
-        mapMaker = new int[26+2+10][2];
-        mapMaker[0] = new int[]{'A', 26};
-        mapMaker[1] = new int[]{'0', 10};
-        for (int x = 0;x < 26; x++) {
-            mapMaker[x+2] = new int[]{'A'+x, 1};
-        }
-        for (int x = 0; x < 10; x++) {
-            mapMaker[x+2+26] = new int[]{'0'+x, 1};
-        }
         super.onCreate(savedInstanceState);
         map = new HashMap<String, String>();
         if (getIntent().getExtras() != null && getIntent().getExtras().containsKey("start")) {
             ArrayList<Integer> start = getIntent().getIntegerArrayListExtra("start");
             ArrayList<Integer> end = getIntent().getIntegerArrayListExtra("end");
-            for (int x = 0; x < start.size(); x++) {
-                for (int y = 0; y < mapMaker[start.get(x)][1]; y++) {
-                    map.put(""+(char)(mapMaker[start.get(x)][0]+y), (char)(mapMaker[end.get(x)][0]+(int)(Math.random()*mapMaker[end.get(x)][1]))+"");
-                }
-            }
+            DBPasswordData temp = new DBPasswordData(start,end);
+            map = temp.generateMap();
             for (String s : map.keySet()) {
                 Log.e("!",s + ": " + map.get(s));
             }
@@ -72,7 +54,7 @@ public class schemaBuilderInstructions extends AppCompatActivity {
         text = new LinearLayout(this);
         text.setOrientation(LinearLayout.VERTICAL);
         text.setGravity(Gravity.NO_GRAVITY);
-        sv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.8f));
+        sv.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.7f));
         Button add = new Button(this);
         add.setText("Add new line");
         add.setOnClickListener(new View.OnClickListener() {
@@ -112,6 +94,25 @@ public class schemaBuilderInstructions extends AppCompatActivity {
         hold.addView(compile);
         hold.addView(trace);
         ll.addView(hold);
+        Button save = new Button(this);
+        save.setText("Save");
+        save.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 0.1f));
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), schemaBuilder.class);
+                if (getIntent().getExtras() != null && getIntent().getExtras().containsKey("start")) {
+                    ArrayList<Integer> start = getIntent().getIntegerArrayListExtra("start");
+                    ArrayList<Integer> end = getIntent().getIntegerArrayListExtra("end");
+                    intent.putIntegerArrayListExtra("start", start);
+                    intent.putIntegerArrayListExtra("end", end);
+                }
+                intent.putStringArrayListExtra("instr", new ArrayList<String>(Arrays.asList(getLines())));
+                startActivity(intent);
+                finish();
+            }
+        });
+        ll.addView(save);
         setContentView(ll);
     }
     private void updateLineNumbers() {
@@ -150,6 +151,8 @@ public class schemaBuilderInstructions extends AppCompatActivity {
                 "EQ [indexOfVariable*] [indexOfVariable*]\n" +
                 "EOS [indexOfVariable] : checks if it is the end of string\n" +
                 "VOWEL [indexOfVariable] : checks if the character is a vowel\n" +
+                "CONTAINS [indexOfVariable*] : checks if this is contained in the map\n"+
+                "[indexOfVariable*] [Math Operator] [indexOfVariable*] : e.g. 1 > 2 \n"+
                 "![statement] : negate", "Shift a pointer in memory: SHIFT [indexOfVariable] [number shifted, signed] [wrap]\n" +
                 "if anything is put in for wrap, the shift will wrap around.", "PARSE [indexOfVariable]: convert to int",
                 "OUTPUT [indexOfVariable]: print character at index", "LOOPSTART [name]: start of a loop", "LOOPEND [name] [CONDITIONAL{if}]", "END: ends program"};
@@ -204,9 +207,7 @@ public class schemaBuilderInstructions extends AppCompatActivity {
         ll.addView(remove);
         text.addView(ll, loc);
     }
-    private void compileAndTest() {
-        //String txt = text.getText().toString();
-        String txt = "";
+    private String[] getLines() {
         String[] instr = new String[text.getChildCount()-1];
         for (int x = 0; x < instr.length; x++) {
             instr[x] = ((Spinner)((LinearLayout)text.getChildAt(x)).getChildAt(1)).getSelectedItem().toString()+" ";
@@ -214,6 +215,12 @@ public class schemaBuilderInstructions extends AppCompatActivity {
             instr[x].trim();
             Log.e("SDFSDF", instr[x]);
         }
+        return instr;
+    }
+    private void compileAndTest() {
+        //String txt = text.getText().toString();
+        String txt = "";
+        String[] instr = getLines();
         PasswordData data = new PasswordData(map,instr);
         String pass = data.getPassword(test.getText().toString(), true);
         trace = data.getFullTrace();
@@ -281,26 +288,4 @@ public class schemaBuilderInstructions extends AppCompatActivity {
 
             Instructions must be space separated.
          */
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_schema_builder_instructions, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 }

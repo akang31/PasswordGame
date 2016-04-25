@@ -62,6 +62,10 @@
             android:name=".schemaBuilderInstructions"
             android:label="@string/title_activity_schema_builder_instructions" >
         </activity>
+        <activity
+            android:name=".search"
+            android:label="@string/title_activity_search" >
+        </activity>
     </application>
 
 </manifest>

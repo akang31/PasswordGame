@@ -9,10 +9,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import com.firebase.client.Firebase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +30,7 @@ public class schemaBuilder extends AppCompatActivity {
         mainMenuCreate();
         //setContentView(R.layout.activity_schema_builder);
     }
-
+    EditText ed;
     private void mainMenuCreate() {
         LinearLayout ll = new LinearLayout(this);
         ll.setOrientation(LinearLayout.VERTICAL);
@@ -40,19 +43,47 @@ public class schemaBuilder extends AppCompatActivity {
         toMap.setText("Edit Mapping");
         Button toSchema = new Button(this);
         toSchema.setOnClickListener(new View.OnClickListener() {
-           public void onClick(View v) {
-               schemaMenuCreate();
-           }
+            public void onClick(View v) {
+                schemaMenuCreate();
+            }
         });
         toSchema.setText("Edit Rules");
-        RelativeLayout t1 = new RelativeLayout(this);
-        t1.setGravity(Gravity.CENTER);
-        RelativeLayout t2 = new RelativeLayout(this);
-        t2.setGravity(Gravity.CENTER);
-        t1.addView(toMap);
-        t2.addView(toSchema);
-        ll.addView(t1);
-        ll.addView(t2);
+        ll.addView(toMap);
+        ll.addView(toSchema);
+        ed = new EditText(this);
+        ll.addView(ed);
+        Firebase.setAndroidContext(this);
+        Button saveToDB = new Button(this);
+        saveToDB.setText("Save to Database");
+        saveToDB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Firebase ref = new Firebase("https://passwordgame.firebaseio.com");
+                if (getIntent().getExtras() != null && getIntent().getExtras().containsKey("start") && getIntent().getExtras().containsKey("instr")) {
+                    ArrayList<Integer> start = getIntent().getIntegerArrayListExtra("start");
+                    ArrayList<Integer> end = getIntent().getIntegerArrayListExtra("end");
+                    ArrayList<String> instr = getIntent().getStringArrayListExtra("instr");
+                    String a1 = "";
+                    for (int x = 0; x < start.size(); x++) {
+                        a1 += start.get(x) + "," + end.get(x);
+                        if (x != start.size()-1) {
+                            a1 += ",";
+                        }
+                    }
+                    String a2 = "";
+                    for (int x = 0; x < instr.size()-1; x++) {
+                        a2 += instr.get(x)+",";
+                    }
+                    a2 += instr.get(instr.size()-1);
+                    DBPasswordData dbpwd = new DBPasswordData(ed.getText().toString(), a1, a2);
+                    Firebase temp = ref.push();
+                    temp.setValue(dbpwd);
+                    finish();
+                }
+
+            }
+        });
+        ll.addView(saveToDB);
         setContentView(ll);
     }
 

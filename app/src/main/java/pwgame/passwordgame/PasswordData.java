@@ -242,6 +242,8 @@ public class PasswordData implements Parcelable
             ret += valueOfIndexOfVariable(s1.nextToken(), mem, ind) + " is a vowel";
         } else if (op.equals("CONTAINS")) {
             ret += "map contains " + valueOfIndexOfVariable(s1.nextToken(),mem,ind);
+        } else {
+            ret += valueOfIndexOfVariable(op, mem, ind) + s1.nextToken() + valueOfIndexOfVariable(s1.nextToken(), mem, ind);
         }
         return ret;
     }
@@ -435,6 +437,25 @@ public class PasswordData implements Parcelable
         } else if (tok.equals("CONTAINS")) {
             int nxt = Integer.parseInt(s1.nextToken());
             rett = preProcess.containsKey(mem[nxt].charAt(indices[nxt])+"");
+        } else {
+            String op = s1.nextToken();
+            String var2 = s1.nextToken();
+            String val1 = valueOfIndexOfVariable(tok, mem, indices);
+            String val2 = valueOfIndexOfVariable(var2, mem, indices);
+            int quant = val1.compareTo(val2);
+            if (op.equals("==")) {
+                rett = quant==0;
+            } else if (op.equals(">")) {
+                rett = quant > 0;
+            } else if (op.equals(">=") || op.equals("=>")) {
+                rett = quant >= 0;
+            } else if (op.equals("<")) {
+                rett = quant < 0;
+            } else if (op.equals("<=") || op.equals("=<")) {
+                rett = quant <= 0;
+            }else if (op.equals("!=") || op.equals("><") || op.equals("<>")) {
+                rett = quant != 0;
+            }
         }
         return rett^flip;
     }
@@ -573,6 +594,8 @@ public class PasswordData implements Parcelable
                 } else {
                     Log.e("LOG", pr[0]+"");
                 }
+                break;
+            case "LABEL":
                 break;
            // case "END":
             //    break;

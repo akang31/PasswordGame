@@ -121,7 +121,6 @@ public class levelActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Context context = getApplicationContext();
                 CharSequence text = pwd.getHint();
-                ;
                 int duration = Toast.LENGTH_SHORT;
 
                 Toast toast = Toast.makeText(context, text, duration);
@@ -303,8 +302,13 @@ public class levelActivity extends AppCompatActivity {
     }
     private void doFinish() {
         Intent intent = new Intent(this, postLevelActivity.class);
-        intent.putParcelableArrayListExtra("pwd", this.getIntent().<PasswordData>getParcelableArrayListExtra("pwd"));
-        intent.putExtra("levelNumber", levelNum-1);
+        if (intent.getExtras() != null && intent.getExtras().containsKey("pwd")) {
+            intent.putParcelableArrayListExtra("pwd", this.getIntent().<PasswordData>getParcelableArrayListExtra("pwd"));
+            intent.putExtra("levelNumber", levelNum - 1);
+        } else {
+            intent.putExtra("PasswordData", this.getIntent().getParcelableExtra("PasswordData"));
+            intent.putExtra("level", this.getIntent().getExtras().getInt("level",0));
+        }
         intent.putStringArrayListExtra("guesses", guesses);
         intent.putStringArrayListExtra("challenges", challenges);
         intent.putStringArrayListExtra("answers", answers);
