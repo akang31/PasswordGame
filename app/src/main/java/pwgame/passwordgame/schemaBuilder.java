@@ -1,6 +1,8 @@
 package pwgame.passwordgame;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -34,6 +36,20 @@ public class schemaBuilder extends AppCompatActivity {
     private void mainMenuCreate() {
         LinearLayout ll = new LinearLayout(this);
         ll.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout templl = new LinearLayout(this);
+        templl.setWeightSum(1.0f);
+        TextView tv = new TextView(this);
+        tv.setText("Schema Name");
+        tv.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+        tv.setTextColor(Color.BLACK);
+        tv.setGravity(Gravity.CENTER_VERTICAL);
+        tv.setTextSize(20f);
+        tv.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 0.5f));
+        templl.addView(tv);
+        ed = new EditText(this);
+        ed.setLayoutParams(new LinearLayout.LayoutParams(0,LinearLayout.LayoutParams.MATCH_PARENT,0.5f));
+        templl.addView(ed);
+        ll.addView(templl);
         Button toMap = new Button(this);
         toMap.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -50,8 +66,6 @@ public class schemaBuilder extends AppCompatActivity {
         toSchema.setText("Edit Rules");
         ll.addView(toMap);
         ll.addView(toSchema);
-        ed = new EditText(this);
-        ll.addView(ed);
         Firebase.setAndroidContext(this);
         Button saveToDB = new Button(this);
         saveToDB.setText("Save to Database");
@@ -89,6 +103,13 @@ public class schemaBuilder extends AppCompatActivity {
 
     private void mapMenuCreate() {
         Intent intent = new Intent(this, schemaBuilderMap.class);
+        if (getIntent().getExtras() != null && getIntent().getExtras().containsKey("start")) {
+            intent.putIntegerArrayListExtra("start",getIntent().getIntegerArrayListExtra("start"));
+            intent.putIntegerArrayListExtra("end",getIntent().getIntegerArrayListExtra("end"));
+        }
+        if (getIntent().getExtras() != null && getIntent().getExtras().containsKey("instr")) {
+            intent.putIntegerArrayListExtra("instr",getIntent().getIntegerArrayListExtra("instr"));
+        }
         //include map
         startActivity(intent);
         finish();
@@ -99,6 +120,9 @@ public class schemaBuilder extends AppCompatActivity {
         if (getIntent().getExtras() != null && getIntent().getExtras().containsKey("start")) {
             intent.putIntegerArrayListExtra("start",getIntent().getIntegerArrayListExtra("start"));
             intent.putIntegerArrayListExtra("end",getIntent().getIntegerArrayListExtra("end"));
+        }
+        if (getIntent().getExtras() != null && getIntent().getExtras().containsKey("instr")) {
+            intent.putIntegerArrayListExtra("instr",getIntent().getIntegerArrayListExtra("instr"));
         }
         startActivity(intent);
         finish();

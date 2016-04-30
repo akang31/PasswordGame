@@ -22,6 +22,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.StringTokenizer;
 
 public class schemaBuilderInstructions extends AppCompatActivity {
     EditText test;
@@ -60,7 +61,7 @@ public class schemaBuilderInstructions extends AppCompatActivity {
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addLine(text.getChildCount() - 1);
+                addLine(text.getChildCount() - 1, "");
             }
         });
         text.addView(add);
@@ -114,14 +115,20 @@ public class schemaBuilderInstructions extends AppCompatActivity {
         });
         ll.addView(save);
         setContentView(ll);
+        if (getIntent().getExtras() != null && getIntent().getExtras().containsKey("instr")) {
+            ArrayList<String> instr = getIntent().getStringArrayListExtra("instr");
+            for (int x = 0;x < instr.size(); x++) {
+                addLine(x, instr.get(x));
+            }
+        }
     }
     private void updateLineNumbers() {
         for (int x = 0; x < text.getChildCount()-1; x++) {
-            ((TextView)((LinearLayout)text.getChildAt(x)).getChildAt(0)).setText((x+1)+"");
+            ((TextView)((LinearLayout)text.getChildAt(x)).getChildAt(0)).setText((x + 1) + "");
         }
     }
     String[] manual;
-    private void addLine(int loc) {
+    private void addLine(int loc, String s) {
         LinearLayout ll = new LinearLayout(this);
         ll.setWeightSum(1.0f);
         TextView line = new TextView(this);
@@ -163,6 +170,22 @@ public class schemaBuilderInstructions extends AppCompatActivity {
         EditText edit = new EditText(this);
         edit.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 0.35f));
         ll.addView(edit);
+        if (s != null && s.length() > 0) {
+            StringTokenizer s1 = new StringTokenizer(s);
+            String op = s1.nextToken();
+            int index = -1;
+            for (int x =0 ; x < fromEntries.length; x++) {
+                if (op.equals(fromEntries[x])) {
+                    index = x;
+                }
+            }
+            from.setSelection(index);
+            String rest = "";
+            while (s1.hasMoreTokens()) {
+                rest += s1.nextToken()+" ";
+            }
+            edit.setText(rest);
+        }
         Button man = new Button(this);
         man.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 0.1f));
         man.setText("?");
@@ -186,7 +209,7 @@ public class schemaBuilderInstructions extends AppCompatActivity {
             public void onClick(View v) {
                 LinearLayout child = ((LinearLayout)(v.getParent()));
                 int index = ((LinearLayout)child.getParent()).indexOfChild(child);
-                addLine(index);
+                addLine(index, "");
                 updateLineNumbers();
             }
         });

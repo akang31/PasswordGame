@@ -26,6 +26,7 @@ import com.firebase.client.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 
 
 public class search extends Activity {
@@ -96,30 +97,73 @@ public class search extends Activity {
         results.setWeightSum(1.0f);
         for (int x = 0; x < all.size(); x++) {
             LinearLayout temp = new LinearLayout(this);
-            temp.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                Log.e("!!", "clicked");
-                int index = ((LinearLayout)v.getParent()).indexOfChild(v);
-                Log.e("!!", index+"");
-                Intent intent = new Intent(v.getContext(), levelActivity.class);
-                Log.e("!", all.get(index).getInstructions());
-                Log.e("!", all.get(index).getMap());
-                intent.putExtra("PasswordData",all.get(index).createPasswordData());
-                intent.putExtra("level", 10);
-                startActivity(intent);
-                }
-            });
+
             temp.setBackgroundResource(R.drawable.layout_bg);
             temp.setWeightSum(1.0f);
-            temp.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 500));
+            temp.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 200));
 
             TextView t = new TextView(this);
             t.setText(all.get(x).getName());
             t.setTextColor(Color.BLACK);
-            t.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 0.7f));
+            t.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 0.5f));
             t.setGravity(Gravity.CENTER);
             temp.addView(t);
+            Button bt1 = new Button(this);
+            bt1.setText("Play");
+            bt1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.e("!!", "clicked");
+                    LinearLayout first = ((LinearLayout) v.getParent());
+                    int index = ((LinearLayout) first.getParent()).indexOfChild(first);
+                    Log.e("!!", index + "");
+                    Intent intent = new Intent(v.getContext(), levelActivity.class);
+                    Log.e("!", all.get(index).getInstructions());
+                    Log.e("!", all.get(index).getMap());
+                    intent.putExtra("PasswordData", all.get(index).createPasswordData());
+                    intent.putExtra("level", 10);
+                    startActivity(intent);
+                }
+            });
+            bt1.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.25f));
+            temp.addView(bt1);
+            Button bt2 = new Button(this);
+            bt2.setText("Edit");
+            bt2.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 0.25f));
+            bt2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.e("!!", "clicked");
+                    LinearLayout first = ((LinearLayout) v.getParent());
+                    int index = ((LinearLayout) first.getParent()).indexOfChild(first);
+                    Log.e("!!", index + "");
+                    Intent intent = new Intent(v.getContext(), schemaBuilder.class);
+                    Log.e("!", all.get(index).getInstructions());
+                    Log.e("!", all.get(index).getMap());
+                    DBPasswordData cur = all.get(index);
+                    ArrayList<Integer> start = new ArrayList<Integer>();
+                    ArrayList<Integer> end = new ArrayList<Integer>();
+                    ArrayList<String> instr = new ArrayList<String>();
+                    StringTokenizer s1 = new StringTokenizer(cur.getMap(), ",");
+                    while (s1.hasMoreTokens()) {
+                        start.add(Integer.parseInt(s1.nextToken()));
+                        end.add(Integer.parseInt(s1.nextToken()));
+                    }
+                    s1 = new StringTokenizer(cur.getInstructions(), ",");
+                    while (s1.hasMoreElements()) {
+                        instr.add(s1.nextToken());
+                    }
+                    intent.putIntegerArrayListExtra("start", start);
+                    intent.putIntegerArrayListExtra("end", end);
+                    intent.putStringArrayListExtra("instr", instr);
+
+                    //.putExtra("PasswordData", all.get(index).createPasswordData());
+                    //intent.putExtra("level", 10);
+                    startActivity(intent);
+                }
+            });
+            temp.addView(bt2);
+
             results.addView(temp);
         }
     }

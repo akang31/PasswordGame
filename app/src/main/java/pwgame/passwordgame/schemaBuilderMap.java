@@ -29,6 +29,13 @@ public class schemaBuilderMap extends AppCompatActivity {
             fromEntries[x+2+26] = x+"";
         }
         mapMenuCreate();
+        if (getIntent().getExtras() != null && getIntent().getExtras().containsKey("start")) {
+            ArrayList<Integer> start = getIntent().getIntegerArrayListExtra("start");
+            ArrayList<Integer> end = getIntent().getIntegerArrayListExtra("end");
+            for (int x = 0; x < start.size(); x++) {
+                addLine(start.get(x), end.get(x));
+            }
+        }
     }
     LinearLayout ll;
     private void mapMenuCreate() {
@@ -39,7 +46,7 @@ public class schemaBuilderMap extends AppCompatActivity {
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addLine();
+                addLine(0,0);
             }
         });
         ll.addView(add);
@@ -69,16 +76,21 @@ public class schemaBuilderMap extends AppCompatActivity {
         Intent intent = new Intent(this, schemaBuilder.class);
         intent.putIntegerArrayListExtra("start", start);
         intent.putIntegerArrayListExtra("end", end);
+        if (getIntent().getExtras() != null && getIntent().getExtras().containsKey("instr")) {
+            intent.putStringArrayListExtra("instr", getIntent().getStringArrayListExtra("instr"));
+        }
         startActivity(intent);
     }
-    private void addLine() {
+    private void addLine(int a, int b) {
         LinearLayout cur = new LinearLayout(this);
         Spinner from = new Spinner(this);
         ArrayAdapter spinAdapt1 = new ArrayAdapter(this, android.R.layout.simple_spinner_item, fromEntries);
         from.setAdapter(spinAdapt1);
+        from.setSelection(a);
         Spinner to = new Spinner(this);
         ArrayAdapter spinAdapt2 = new ArrayAdapter(this, android.R.layout.simple_spinner_item, fromEntries);
         to.setAdapter(spinAdapt2);
+        to.setSelection(b);
         cur.addView(from);
         cur.addView(to);
         Button del = new Button(this);
@@ -93,26 +105,5 @@ public class schemaBuilderMap extends AppCompatActivity {
         });
         cur.addView(del);
         ll.addView(cur, ll.getChildCount()-2);
-    }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_schema_builder_map, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }
