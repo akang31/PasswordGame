@@ -26,7 +26,7 @@ public class postLevelActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         PasswordData pwd = new PasswordData();
         int levelNum = 0;
-        if (getIntent().getExtras().containsKey("pwd")) {
+        if (getIntent().hasExtra("pwd")) {
             levelNum = getIntent().getExtras().getInt("levelNumber");
             pwd = getIntent().<PasswordData>getParcelableArrayListExtra("pwd").get(levelNum);
         } else {
@@ -149,7 +149,7 @@ public class postLevelActivity extends AppCompatActivity {
         nextLevel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (getIntent().getExtras().containsKey("pwd")) {
+                if (getIntent().hasExtra("pwd")) {
                     ArrayList<PasswordData> arr = getIntent().<PasswordData>getParcelableArrayListExtra("pwd");
                     int levelNum = getIntent().getExtras().getInt("levelNumber") + 1;
                     Log.e("Check", levelNum + " " + arr.size());

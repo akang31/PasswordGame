@@ -35,9 +35,11 @@ public class levelActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getIntent().hasExtra("PasswordData")) {
+            Log.e("!!!!!", "has PasswordData");
             pwd = getIntent().getExtras().getParcelable("PasswordData");
             levelNum = getIntent().getExtras().getInt("level")+1;
         } else {
+            Log.e("!!!!!", "has pwd");
             levelNum = getIntent().getExtras().getInt("levelNum")+1;
             pwd = (getIntent().<PasswordData>getParcelableArrayListExtra("pwd")).get(levelNum-1);
         }
@@ -302,10 +304,12 @@ public class levelActivity extends AppCompatActivity {
     }
     private void doFinish() {
         Intent intent = new Intent(this, postLevelActivity.class);
-        if (intent.getExtras() != null && intent.getExtras().containsKey("pwd")) {
+        if (getIntent().hasExtra("pwd")) {
+            Log.e("!", "contains pwd");
             intent.putParcelableArrayListExtra("pwd", this.getIntent().<PasswordData>getParcelableArrayListExtra("pwd"));
             intent.putExtra("levelNumber", levelNum - 1);
         } else {
+            Log.e("!", "does not contain pwd");
             intent.putExtra("PasswordData", this.getIntent().getParcelableExtra("PasswordData"));
             intent.putExtra("level", this.getIntent().getExtras().getInt("level",0));
         }
